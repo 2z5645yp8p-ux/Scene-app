@@ -119,12 +119,54 @@ body.authed #auth{display:none}
 .toast{position:fixed;left:50%;top:76px;transform:translateX(-50%);background:#2a1d4d;border:1px solid #7a46d6;padding:11px 18px;border-radius:12px;font-size:13px;z-index:200;display:none}
 @media(min-width:800px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hero{min-height:260px}}
 @media(max-width:520px){header{padding:14px 16px}main{padding:17px 15px}.grid{grid-template-columns:1fr 1fr;gap:10px}.cover{height:100px}.card-body{padding:10px}.hero h1{font-size:26px}.business-grid{grid-template-columns:1fr}}
+
+.brandpane{display:none}
+.deskonly{display:none}
+@media(min-width:900px){
+#auth{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+.brandpane{display:flex;grid-column:1;grid-row:1;min-height:100vh;flex-direction:column;gap:38px;padding:48px 56px;background:linear-gradient(180deg,#0b0818 0,#0b0818f2 38%,#0b081800 72%),var(--mosque) center bottom/100% auto no-repeat,linear-gradient(180deg,#120a2a,#2a1458)}
+.bp-top{display:flex;align-items:center;gap:16px}
+.bp-logo{width:76px;height:70px;background:var(--logo) center/contain no-repeat;filter:drop-shadow(0 0 22px #8b35ff88)}
+.bp-word{font-size:38px;font-weight:900;letter-spacing:5px}
+.bp-tag{color:#ddd5f2;font-size:14px}
+.bp-mid h2{font-size:40px;line-height:1.15;margin:0 0 10px;max-width:480px}
+.bp-mid p{margin:0 0 20px;max-width:460px}
+.bp-list{list-style:none;padding:0;margin:0;display:grid;gap:13px}
+.bp-list li{color:#e6def8;font-size:15px}
+.av{grid-column:2;grid-row:1;min-height:100vh;width:100%;max-width:460px}
+#vWelcome .biglogo,#vWelcome .wordmark,#vWelcome .tagline,#vWelcome .sky{display:none!important}
+#vWelcome{justify-content:center!important;padding-top:30px!important}
+#vWelcome .ah{font-size:34px;margin-top:0!important}
+#vWelcome .stack{margin-top:24px}
+.bottom{top:0;right:auto;bottom:0;width:240px;flex-direction:column;justify-content:flex-start;gap:6px;padding:22px 14px;border-top:0;border-right:1px solid var(--border)}
+.bottom::before{content:"SCENE";display:block;height:46px;line-height:46px;padding-left:54px;margin:4px 6px 22px;font-size:25px;font-weight:900;letter-spacing:3px;background:var(--logo) left center/42px no-repeat}
+.nav{flex:none;max-width:none;width:100%;flex-direction:row;justify-content:flex-start;gap:14px;font-size:15px;padding:12px 16px;border-radius:14px;color:#aaa4bd}
+.nav b{width:30px;font-size:21px;text-align:center}
+.nav:hover{background:#1d1932}
+.nav.active{background:#2a1d4d;color:#d9a8ff}
+.nav.create b{width:30px;height:30px;font-size:20px;border-radius:10px}
+.deskonly{display:flex!important}
+.app{max-width:none;margin:0 0 0 240px;padding-bottom:20px}
+header .brand{display:none}
+header{justify-content:flex-end;padding:14px 36px}
+main{max-width:1040px;margin:0 auto;padding:26px 36px}
+}
+.guestbtns,.backbrowse{display:none}
+body.guest .guestbtns{display:flex;gap:8px;align-items:center}
+body.guest .backbrowse{display:inline-block;margin-top:8px}
+body.guest .backwel{display:none}
+@media(min-width:900px){header{gap:18px}}
 </style>
 </head>
 <body>
 
 <!-- ========== AUTH SCREENS ========== -->
 <div id="auth">
+ <aside class="brandpane" aria-hidden="true">
+  <div class="bp-top"><div class="bp-logo"></div><div><div class="bp-word">SCENE</div><div class="bp-tag">Discover. Join. Be Part of It.</div></div></div>
+  <div class="bp-mid"><h2>What's happening in <span class="purple">your city?</span></h2><p>Events, hangouts, deals and more across Islamabad.</p>
+   <ul class="bp-list"><li>📅 Discover local events</li><li>👥 Join activities and meet people</li><li>📍 Explore cafes and deals</li><li>📣 Create your own hangout</li><li>💬 Chat and connect</li></ul></div>
+ </aside>
  <!-- Welcome -->
  <section class="av on" id="vWelcome">
   <div class="sky" aria-hidden="true"></div>
@@ -151,7 +193,7 @@ body.authed #auth{display:none}
    <button class="btn full" type="submit" id="siBtn">Sign In</button>
   </form>
   <p class="alt">New to SCENE? <button class="lnk" type="button" onclick="showAuth('signup')">Create Account</button></p>
-  <button class="lnk" type="button" onclick="showAuth('welcome')">← Back</button>
+  <button class="lnk backwel" type="button" onclick="showAuth('welcome')">← Back</button><button class="lnk backbrowse" type="button" onclick="browseAsGuest()">Continue browsing without an account</button>
  </section>
 
  <!-- Sign up -->
@@ -167,7 +209,7 @@ body.authed #auth{display:none}
    <button class="btn full" type="submit" id="suBtn">Create Account</button>
   </form>
   <p class="alt">Already have an account? <button class="lnk" type="button" onclick="showAuth('signin')">Sign In</button></p>
-  <button class="lnk" type="button" onclick="showAuth('welcome')">← Back</button>
+  <button class="lnk backwel" type="button" onclick="showAuth('welcome')">← Back</button><button class="lnk backbrowse" type="button" onclick="browseAsGuest()">Continue browsing without an account</button>
  </section>
 
  <!-- Forgot password -->
@@ -208,6 +250,7 @@ body.authed #auth{display:none}
 <header>
  <div class="brand"><div class="logo" role="img" aria-label="SCENE logo"></div> SCENE</div>
  <div class="location">📍 Islamabad <span class="purple">⌄</span></div>
+ <div class="guestbtns"><button class="btn secondary small" type="button" onclick="showAuth('signin')">Sign In</button><button class="btn small" type="button" onclick="showAuth('signup')">Create Account</button></div>
 </header>
 
 <main>
@@ -360,6 +403,7 @@ body.authed #auth{display:none}
  <button class="nav create" data-page="create" onclick="showPage('create',this)"><b>＋</b>Create</button>
  <button class="nav" data-page="chat" onclick="showPage('chat',this)"><b>▢</b>Chat</button>
  <button class="nav" data-page="profile" onclick="showPage('profile',this)"><b>♙</b>Profile</button>
+ <button class="nav deskonly" data-page="premium" onclick="showPage('premium',this)"><b>👑</b>Premium</button>
 </nav>
 <div class="toast" id="toast" role="status"></div>
 
@@ -377,6 +421,10 @@ else{sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSes
 /* ============ HELPERS ============ */
 const EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const $=id=>document.getElementById(id);
+const isDesktop=()=>window.matchMedia('(min-width:900px)').matches;
+const isGuest=()=>document.body.classList.contains('guest');
+function browseAsGuest(){document.body.classList.add('authed','guest');showPage('home');}
+function needLogin(reason){showAuth('signin');msg('siMsg','Please sign in to '+reason+'.','');}
 let recovering=/type=recovery/.test(location.hash);
 let appUserId=null;
 
@@ -428,6 +476,7 @@ async function loadProfile(user){
 function enterApp(user){
  if(!user||appUserId===user.id)return;
  appUserId=user.id;
+ document.body.classList.remove('guest');
  document.body.classList.add('authed');
  showPage('home');
  loadProfile(user);
@@ -435,7 +484,7 @@ function enterApp(user){
 function leaveApp(){
  appUserId=null;
  ['siPass','suPass','suPass2','rpPass','rpPass2'].forEach(i=>{$(i).value='';});
- showAuth('welcome');
+ if(isDesktop())browseAsGuest();else showAuth('welcome');
 }
 
 /* ============ AUTH ACTIONS (listeners added once) ============ */
@@ -516,7 +565,7 @@ $('logoutBtn').addEventListener('click',async()=>{
   if(!sb)msg('siMsg',configError,'err');
   return;
  }
- if(!sb){showAuth('welcome');return;}
+ if(!sb){if(isDesktop())browseAsGuest();else showAuth('welcome');return;}
  sb.auth.onAuthStateChange((ev,session)=>{
   if(ev==='PASSWORD_RECOVERY'){recovering=true;showAuth('reset');}
   else if(ev==='SIGNED_OUT'&&appUserId){setTimeout(leaveApp,0);}
@@ -527,11 +576,12 @@ $('logoutBtn').addEventListener('click',async()=>{
  if(data.session){
   if(location.hash.indexOf('access_token')>-1)history.replaceState(null,'',location.pathname);
   enterApp(data.session.user);
- }else{showAuth('welcome');}
+ }else{if(isDesktop())browseAsGuest();else showAuth('welcome');}
 })();
 
 /* ============ EXISTING APP FUNCTIONS (unchanged) ============ */
 function showPage(id,button){
+ if(isGuest()&&(id==='create'||id==='chat'||id==='profile')){needLogin(id==='create'?'create an activity':id==='chat'?'use chat':'view your profile');return;}
  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
  document.getElementById(id).classList.add('active');
  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));
@@ -540,6 +590,7 @@ function showPage(id,button){
  window.scrollTo({top:0,behavior:'smooth'});
 }
 function joinActivity(button,countId){
+ if(isGuest()){needLogin('join activities');return;}
  if(button.dataset.joined==='yes'){
   button.textContent='Join';button.dataset.joined='no';
   if(countId){let n=Number(document.getElementById(countId).dataset.count||24)-1;document.getElementById(countId).dataset.count=n;document.getElementById(countId).textContent=n+' joined';}
