@@ -1,0 +1,402 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090714">
+<title>SCENE — Discover. Join. Be Part of It.</title>
+<style>
+:root {
+  --bg:#090714;
+  --panel:#151226;
+  --panel2:#1d1932;
+  --purple:#8b35ff;
+  --purple2:#641cff;
+  --text:#fff;
+  --muted:#aaa4bd;
+  --gold:#ffc64d;
+  --border:#302747;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;background:var(--bg);color:var(--text);
+ font-family:Inter,Arial,sans-serif;
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:1200px;margin:auto;min-height:100vh;padding-bottom:85px}
+header{
+ display:flex;align-items:center;justify-content:space-between;
+ padding:18px 24px;border-bottom:1px solid var(--border);
+ position:sticky;top:0;background:#090714ed;z-index:10;
+ backdrop-filter:blur(16px)
+}
+.brand{display:flex;align-items:center;gap:10px;font-size:25px;font-weight:900;letter-spacing:2px}
+.logo{
+ width:39px;height:39px;border-radius:13px;
+ background:linear-gradient(140deg,#c044ff,#681cff);
+ display:grid;place-items:center;font-size:27px;font-weight:900;
+ box-shadow:0 0 25px #8b35ff66
+}
+.location{color:var(--muted);font-size:13px}
+main{padding:22px 24px}
+.page{display:none}
+.page.active{display:block}
+h1{font-size:29px;margin:8px 0}
+h2{font-size:20px;margin:25px 0 14px}
+p{color:var(--muted);line-height:1.5}
+.purple{color:#bb82ff}
+.search{
+ width:100%;padding:15px 17px;border-radius:15px;
+ background:var(--panel);border:1px solid var(--border);
+ color:white;outline:none;margin:16px 0
+}
+.hero{
+ min-height:220px;padding:27px;border-radius:23px;
+ background:linear-gradient(100deg,#26104b,#15102d 60%,#38145e);
+ border:1px solid #55318a;display:flex;flex-direction:column;
+ justify-content:center;position:relative;overflow:hidden
+}
+.hero:after{
+ content:"S";position:absolute;right:30px;top:-45px;
+ font-size:230px;font-weight:900;color:#ffffff0b
+}
+.hero h1{font-size:32px;max-width:450px}
+.hero p{max-width:420px;color:#ddd5f2}
+.btn{
+ border:0;border-radius:12px;padding:12px 19px;
+ color:white;font-weight:750;
+ background:linear-gradient(100deg,#a239ff,#651dff);
+ box-shadow:0 5px 20px #791eff35
+}
+.btn.secondary{background:#29213e;box-shadow:none;border:1px solid var(--border)}
+.btn.gold{background:linear-gradient(100deg,#ffda70,#e99c16);color:#241600}
+.btn.small{padding:9px 13px;font-size:12px}
+.section-head{display:flex;justify-content:space-between;align-items:center}
+.section-head h2{margin:25px 0 13px}
+.categories{display:flex;gap:9px;overflow:auto;padding:4px 0 12px}
+.chip{
+ white-space:nowrap;padding:10px 16px;border-radius:30px;
+ background:var(--panel);border:1px solid var(--border);
+ color:#ddd5ed;font-size:13px
+}
+.chip.selected{background:#7629e8;border-color:#a65aff;color:white}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.card{
+ background:var(--panel);border:1px solid var(--border);
+ border-radius:17px;overflow:hidden;min-width:0
+}
+.cover{
+ height:125px;display:flex;align-items:center;justify-content:center;
+ font-size:48px;background:linear-gradient(135deg,#342052,#17152a)
+}
+.cover.cricket{background:linear-gradient(135deg,#173e38,#172b35)}
+.cover.music{background:linear-gradient(135deg,#64206e,#24194c)}
+.cover.cafe{background:linear-gradient(135deg,#66432d,#292039)}
+.card-body{padding:13px}
+.tag{font-size:10px;color:#c58cff;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.card h3{font-size:15px;margin:7px 0}
+.meta{font-size:12px;color:var(--muted);margin:6px 0}
+.card-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px}
+.count{font-size:11px;color:#c9b9e6}
+.bottom{
+ position:fixed;bottom:0;left:0;right:0;z-index:20;
+ background:#100d1ef5;border-top:1px solid var(--border);
+ display:flex;justify-content:center;gap:0;padding:9px 5px;
+ backdrop-filter:blur(18px)
+}
+.nav{
+ flex:1;max-width:130px;border:0;background:none;color:#89829d;
+ display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px
+}
+.nav b{font-size:21px;font-weight:500}
+.nav.active{color:#b85bff}
+.nav.create b{
+ background:linear-gradient(140deg,#bd47ff,#651cff);
+ color:white;width:39px;height:32px;border-radius:12px;
+ display:grid;place-items:center;font-size:24px
+}
+.form{
+ background:var(--panel);padding:18px;border:1px solid var(--border);
+ border-radius:18px;margin-top:15px
+}
+.field{margin:13px 0}
+.field label{display:block;color:#c9c0dc;font-size:12px;margin-bottom:7px}
+.field input,.field textarea,.field select{
+ width:100%;padding:13px;border-radius:11px;
+ border:1px solid var(--border);background:#0e0b1b;color:white;outline:none
+}
+.field textarea{min-height:85px;resize:vertical}
+.field select option{background:#151226}
+.full{width:100%}
+.profile-top{text-align:center;padding:25px;background:var(--panel);border-radius:20px}
+.avatar{
+ width:85px;height:85px;border-radius:50%;margin:auto;
+ display:grid;place-items:center;font-size:32px;
+ background:linear-gradient(140deg,#bb55ff,#4d20a5);
+ border:3px solid #c28aff
+}
+.stats{display:flex;justify-content:space-around;margin:20px 0}
+.stats strong{display:block;font-size:19px}
+.stats span{font-size:11px;color:var(--muted)}
+.chat-row{
+ display:flex;gap:12px;align-items:center;padding:15px;
+ background:var(--panel);border:1px solid var(--border);
+ border-radius:14px;margin:10px 0;cursor:pointer
+}
+.chat-avatar{width:43px;height:43px;border-radius:50%;background:#492779;display:grid;place-items:center}
+.chat-detail{flex:1}
+.chat-detail strong{font-size:14px}
+.chat-detail p{font-size:12px;margin:5px 0 0}
+.message{
+ padding:12px 15px;border-radius:17px;margin:12px 0;
+ max-width:80%;background:#211a34;font-size:13px
+}
+.message.mine{margin-left:auto;background:#7025d8}
+.chatbox{display:flex;gap:8px;margin-top:20px}
+.chatbox input{flex:1;min-width:0;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px;color:white}
+.price{
+ font-size:27px;font-weight:900;color:#fff;margin:12px 0
+}
+.feature{padding:9px 0;color:#d8d0e7;font-size:13px}
+.business-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.business-item{background:var(--panel);border:1px solid var(--border);padding:16px;border-radius:16px}
+.empty{text-align:center;padding:35px 15px;color:var(--muted)}
+footer{text-align:center;color:#6e6681;font-size:11px;padding:25px}
+@media(min-width:800px){
+ .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .hero{min-height:260px}
+}
+@media(max-width:520px){
+ header{padding:14px 16px}
+ main{padding:17px 15px}
+ .grid{grid-template-columns:1fr 1fr;gap:10px}
+ .cover{height:100px}
+ .card-body{padding:10px}
+ .hero h1{font-size:26px}
+ .business-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <div class="brand"><div class="logo">S</div> SCENE</div>
+ <div class="location">📍 Islamabad <span class="purple">⌄</span></div>
+</header>
+
+<main>
+<!-- HOME -->
+<section id="home" class="page active">
+ <div class="section-head">
+  <div><div class="tag">YOUR CITY. YOUR COMMUNITY.</div><h1>What's happening <span class="purple">today?</span></h1></div>
+  <span>🔔</span>
+ </div>
+ <input class="search" placeholder="⌕  Search events, places or people..." oninput="searchCards(this.value)">
+ <div class="hero">
+  <div class="tag">DISCOVER YOUR CITY</div>
+  <h1>Find your next <span class="purple">SCENE.</span></h1>
+  <p>Discover events, meet people, explore places and be part of something exciting.</p>
+  <div><button class="btn" onclick="showPage('explore')">Explore Now →</button></div>
+ </div>
+ <div class="section-head"><h2>Nearby Activities</h2><button class="btn secondary small" onclick="showPage('explore')">See all</button></div>
+ <div class="grid" id="activityGrid">
+  <article class="card activity" data-search="cricket sports f9 park">
+   <div class="cover cricket">🏏</div>
+   <div class="card-body"><div class="tag">SPORTS</div><h3>Cricket Match</h3><div class="meta">📍 F-9 Park · Today, 5 PM</div><div class="card-actions"><span class="count" id="cricketCount">24 joined</span><button class="btn small" onclick="joinActivity(this,'cricketCount')">Join</button></div></div>
+  </article>
+  <article class="card activity" data-search="music festival event">
+   <div class="cover music">🎵</div>
+   <div class="card-body"><div class="tag">EVENT</div><h3>Music Festival</h3><div class="meta">📍 F-9 Park · Saturday</div><div class="card-actions"><span class="count">120 going</span><button class="btn small" onclick="joinActivity(this)">Join</button></div></div>
+  </article>
+  <article class="card activity" data-search="coffee cafe deal">
+   <div class="cover cafe">☕</div>
+   <div class="card-body"><div class="tag">DEAL</div><h3>Coffee Special</h3><div class="meta">📍 F-8 Markaz · 20% off</div><div class="card-actions"><span class="count">Offer today</span><button class="btn small" onclick="showPage('explore')">View</button></div></div>
+  </article>
+  <article class="card activity" data-search="football sports">
+   <div class="cover cricket">⚽</div>
+   <div class="card-body"><div class="tag">SPORTS</div><h3>Football Meetup</h3><div class="meta">📍 F-10 Ground · 6 PM</div><div class="card-actions"><span class="count">12 joined</span><button class="btn small" onclick="joinActivity(this)">Join</button></div></div>
+  </article>
+ </div>
+ <h2>Explore by Interest</h2>
+ <div class="categories">
+  <button class="chip selected" onclick="filterType('all',this)">All</button>
+  <button class="chip" onclick="filterType('sports',this)">Sports</button>
+  <button class="chip" onclick="filterType('event',this)">Events</button>
+  <button class="chip" onclick="filterType('deal',this)">Deals</button>
+  <button class="chip" onclick="filterType('hangout',this)">Hangouts</button>
+ </div>
+</section>
+
+<!-- EXPLORE -->
+<section id="explore" class="page">
+ <div class="tag">FIND YOUR SCENE</div><h1>Explore <span class="purple">your city.</span></h1>
+ <p>Discover places, events, deals and activities around you.</p>
+ <div class="categories">
+  <button class="chip selected" onclick="filterType('all',this)">All</button>
+  <button class="chip" onclick="filterType('sports',this)">Sports</button>
+  <button class="chip" onclick="filterType('event',this)">Events</button>
+  <button class="chip" onclick="filterType('deal',this)">Deals</button>
+  <button class="chip" onclick="filterType('hangout',this)">Hangouts</button>
+ </div>
+ <div class="grid">
+  <article class="card"><div class="cover music">🎤</div><div class="card-body"><div class="tag">FEATURED EVENT</div><h3>Weekend Music Night</h3><div class="meta">📍 Islamabad · Saturday</div><button class="btn small full" onclick="joinActivity(this)">Join Event</button></div></article>
+  <article class="card"><div class="cover cafe">☕</div><div class="card-body"><div class="tag">LOCAL DEAL</div><h3>Coffee Happy Hour</h3><div class="meta">📍 F-8 Markaz · 20% off</div><button class="btn small full" onclick="alert('Demo offer. Business details coming soon!')">View Deal</button></div></article>
+  <article class="card"><div class="cover cricket">🏸</div><div class="card-body"><div class="tag">ACTIVITY</div><h3>Badminton Meetup</h3><div class="meta">📍 Sports Complex · 7 PM</div><button class="btn small full" onclick="joinActivity(this)">Join</button></div></article>
+  <article class="card"><div class="cover">🎮</div><div class="card-body"><div class="tag">HANGOUT</div><h3>Gaming Night</h3><div class="meta">📍 Blue Area · 8 PM</div><button class="btn small full" onclick="joinActivity(this)">Join</button></div></article>
+ </div>
+</section>
+
+<!-- CREATE -->
+<section id="create" class="page">
+ <div class="tag">MAKE SOMETHING HAPPEN</div><h1>Create an <span class="purple">Activity.</span></h1>
+ <p>Invite your city. Let people discover and join your plan.</p>
+ <form class="form" id="createForm">
+  <div class="field"><label>Activity title</label><input id="activityTitle" required placeholder="e.g. Cricket Match at F-9 Park"></div>
+  <div class="field"><label>Activity type</label><select id="activityType"><option>Sports</option><option>Hangout</option><option>Event</option><option>Study Group</option><option>Gaming</option></select></div>
+  <div class="field"><label>Description</label><textarea id="activityDescription" placeholder="Tell people what your activity is about..."></textarea></div>
+  <div class="field"><label>Date</label><input type="date" id="activityDate" required></div>
+  <div class="field"><label>Time</label><input type="time" id="activityTime" required></div>
+  <div class="field"><label>Location</label><input id="activityLocation" required placeholder="e.g. F-9 Park, Islamabad"></div>
+  <div class="field"><label>Who can join?</label><select id="activityPrivacy"><option>Public — Everyone can join</option><option>Private — Invite only</option></select></div>
+  <button class="btn full" type="submit">＋ Publish Activity</button>
+ </form>
+ <p id="createMessage"></p>
+</section>
+
+<!-- CHAT -->
+<section id="chat" class="page">
+ <div class="tag">STAY CONNECTED</div><h1>Your <span class="purple">Chats.</span></h1>
+ <p>Connect with people and activity members.</p>
+ <div id="chatList">
+  <div class="chat-row" onclick="openChat('Sarah Khan')"><div class="chat-avatar">👩🏻</div><div class="chat-detail"><strong>Sarah Khan</strong><p>Are you joining the cricket match?</p></div><span class="count">2m</span></div>
+  <div class="chat-row" onclick="openChat('Ahmed Ali')"><div class="chat-avatar">👨🏻</div><div class="chat-detail"><strong>Ahmed Ali</strong><p>See you at the meetup!</p></div><span class="count">1h</span></div>
+  <div class="chat-row" onclick="openChat('Music Festival Group')"><div class="chat-avatar">🎵</div><div class="chat-detail"><strong>Music Festival Group</strong><p>What time are we meeting?</p></div><span class="count">3h</span></div>
+ </div>
+ <div id="chatWindow" style="display:none">
+  <button class="btn secondary small" onclick="closeChat()">← Back to chats</button>
+  <h2 id="chatName">Chat</h2>
+  <div id="messages">
+   <div class="message">Hey! Are you joining the activity?</div>
+   <div class="message mine">Yes! See you there.</div>
+  </div>
+  <div class="chatbox"><input id="chatInput" placeholder="Type a message..."><button class="btn" onclick="sendMessage()">➤</button></div>
+  <p class="meta">Demo chat — messages are not sent online yet.</p>
+ </div>
+</section>
+
+<!-- PROFILE -->
+<section id="profile" class="page">
+ <div class="profile-top">
+  <div class="avatar">👤</div><h2 style="margin:12px 0 4px">Your Name</h2>
+  <div class="purple">@yourusername</div><p>Explore · Connect · Enjoy</p>
+  <div class="stats"><div><strong>0</strong><span>Posts</span></div><div><strong>0</strong><span>Followers</span></div><div><strong>0</strong><span>Following</span></div></div>
+  <button class="btn secondary small" onclick="alert('Profile editing will be connected with accounts later.')">Edit Profile</button>
+ </div>
+ <h2>Your Activities</h2>
+ <div class="empty">Your created and joined activities will appear here.</div>
+</section>
+
+<!-- PREMIUM -->
+<section id="premium" class="page">
+ <div class="tag">UNLOCK MORE. DO MORE.</div><h1>SCENE <span style="color:var(--gold)">Premium.</span></h1>
+ <div class="form" style="border-color:#95651c">
+  <div style="font-size:35px">👑</div><h2>Make more happen.</h2>
+  <div class="price">Rs. 299 <span style="font-size:13px;color:var(--muted)">/ month</span></div>
+  <div class="feature">✓ Boost your activities</div>
+  <div class="feature">✓ Get featured in discovery</div>
+  <div class="feature">✓ Advanced activity insights</div>
+  <div class="feature">✓ Premium profile badge</div>
+  <div class="feature">✓ Ad-free experience</div>
+  <button class="btn gold full" onclick="alert('Premium payment is not connected in this demo.')">Explore Premium</button>
+ </div>
+ <h2>Business Growth with SCENE</h2>
+ <p>Help your cafe, restaurant or brand reach more local people.</p>
+ <div class="business-grid">
+  <div class="business-item"><div style="font-size:25px">📣</div><h3>Featured Listing</h3><p>Promote your deals and events.</p><strong>From Rs. 500</strong></div>
+  <div class="business-item"><div style="font-size:25px">🏪</div><h3>Business Profile</h3><p>Showcase your local business.</p><strong>Plans coming soon</strong></div>
+  <div class="business-item"><div style="font-size:25px">🚀</div><h3>Activity Boost</h3><p>Reach more people nearby.</p><strong>From Rs. 100</strong></div>
+  <div class="business-item"><div style="font-size:25px">📊</div><h3>Promotion Insights</h3><p>Understand your reach.</p><strong>Business plans</strong></div>
+ </div>
+ <p class="meta">Prices shown are proposed demo prices, not active offers.</p>
+</section>
+</main>
+
+<footer>SCENE © 2026 · Discover. Join. Be Part of It.</footer>
+</div>
+
+<nav class="bottom">
+ <button class="nav active" data-page="home" onclick="showPage('home',this)"><b>⌂</b>Home</button>
+ <button class="nav" data-page="explore" onclick="showPage('explore',this)"><b>⌕</b>Explore</button>
+ <button class="nav create" data-page="create" onclick="showPage('create',this)"><b>＋</b>Create</button>
+ <button class="nav" data-page="chat" onclick="showPage('chat',this)"><b>▢</b>Chat</button>
+ <button class="nav" data-page="profile" onclick="showPage('profile',this)"><b>♙</b>Profile</button>
+</nav>
+
+<script>
+function showPage(id,button){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));
+ const nav=document.querySelector('.nav[data-page="'+id+'"]');
+ if(nav)nav.classList.add('active');
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function joinActivity(button,countId){
+ if(button.dataset.joined==='yes'){
+  button.textContent='Join';button.dataset.joined='no';
+  if(countId){let n=Number(document.getElementById(countId).dataset.count||24)-1;document.getElementById(countId).dataset.count=n;document.getElementById(countId).textContent=n+' joined';}
+  return;
+ }
+ button.dataset.joined='yes';button.textContent='Joined ✓';
+ if(countId){let el=document.getElementById(countId);let n=Number(el.dataset.count||24)+1;el.dataset.count=n;el.textContent=n+' joined';}
+}
+function filterType(type,button){
+ document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+ if(button)button.classList.add('selected');
+ document.querySelectorAll('#activityGrid .activity').forEach(card=>{
+  card.style.display=(type==='all'||card.dataset.search.includes(type))?'':'none';
+ });
+}
+function searchCards(value){
+ document.querySelectorAll('#activityGrid .activity').forEach(card=>{
+  card.style.display=card.dataset.search.includes(value.toLowerCase())?'':'none';
+ });
+}
+document.getElementById('createForm').addEventListener('submit',function(e){
+ e.preventDefault();
+ const title=document.getElementById('activityTitle').value;
+ const type=document.getElementById('activityType').value;
+ const location=document.getElementById('activityLocation').value;
+ const privacy=document.getElementById('activityPrivacy').value;
+ const card=document.createElement('article');
+ card.className='card activity';
+ card.dataset.search=(title+' '+type+' '+location).toLowerCase();
+ card.innerHTML='<div class="cover">✨</div><div class="card-body"><div class="tag">'+type+'</div><h3></h3><div class="meta"></div><div class="card-actions"><span class="count">'+(privacy.startsWith('Public')?'Public activity':'Private activity')+'</span><button class="btn small" onclick="joinActivity(this)">Join</button></div></div>';
+ card.querySelector('h3').textContent=title;
+ card.querySelector('.meta').textContent='📍 '+location;
+ document.getElementById('activityGrid').prepend(card);
+ document.getElementById('createMessage').textContent='✓ Activity added to this demo!';
+ this.reset();showPage('home');
+});
+function openChat(name){
+ document.getElementById('chatList').style.display='none';
+ document.getElementById('chatWindow').style.display='block';
+ document.getElementById('chatName').textContent=name;
+}
+function closeChat(){
+ document.getElementById('chatWindow').style.display='none';
+ document.getElementById('chatList').style.display='block';
+}
+function sendMessage(){
+ const input=document.getElementById('chatInput');
+ if(!input.value.trim())return;
+ const msg=document.createElement('div');
+ msg.className='message mine';msg.textContent=input.value;
+ document.getElementById('messages').appendChild(msg);
+ input.value='';
+}
+</script>
+</body>
+</html>
