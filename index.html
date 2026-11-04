@@ -159,6 +159,19 @@ body.guest .backwel{display:none}
 .sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .field input[type=date],.field input[type=time]{color-scheme:dark;min-height:48px;cursor:pointer;-webkit-appearance:none;appearance:none}
 .field input[type=date]::-webkit-calendar-picker-indicator,.field input[type=time]::-webkit-calendar-picker-indicator{filter:invert(1);opacity:.9;cursor:pointer}
+.card-actions{flex-wrap:wrap}
+.chathead{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:16px 16px 0 0}
+#messages{height:clamp(240px,calc(100vh - 330px),560px);overflow-y:auto;padding:14px;background:#0e0b1b;border:1px solid var(--border);border-top:0;display:flex;flex-direction:column;gap:5px;scroll-behavior:smooth}
+.message{max-width:78%;margin:0;padding:9px 13px;border-radius:16px 16px 16px 4px;background:#211a34;font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+.message.mine{margin-left:auto;background:linear-gradient(135deg,#8b35ff,#651dff);border-radius:16px 16px 4px 16px}
+.message .who{font-size:11px;font-weight:700;color:#c58cff;margin-bottom:2px}
+.message .tm{font-size:10px;opacity:.65;text-align:right;margin-top:3px}
+.dsep{align-self:center;font-size:11px;color:var(--muted);background:#1a1530;padding:4px 12px;border-radius:12px;margin:8px 0}
+.chatbox{display:flex;gap:8px;padding:10px;background:var(--panel);border:1px solid var(--border);border-radius:0 0 16px 16px;margin-top:0}
+.chatbox input{border-radius:22px;padding:12px 16px;outline:none}
+.chatbox input:focus{border-color:#a65aff}
+.chatbox .btn{border-radius:50%;width:44px;height:44px;padding:0;flex:none}
+#chat.chatopen>.tag,#chat.chatopen>h1,#chat.chatopen>p{display:none}
 </style>
 </head>
 <body>
@@ -353,13 +366,12 @@ body.guest .backwel{display:none}
   <div class="chat-row" onclick="openChat('Music Festival Group')"><div class="chat-avatar">🎵</div><div class="chat-detail"><strong>Music Festival Group</strong><p>What time are we meeting?</p></div><span class="count">3h</span></div>
  </div>
  <div id="chatWindow" style="display:none">
-  <button class="btn secondary small" onclick="closeChat()">← Back to chats</button>
-  <h2 id="chatName">Chat</h2>
+  <div class="chathead"><button class="btn secondary small" type="button" onclick="closeChat()" aria-label="Back to chats">←</button><div class="chat-avatar" id="chatAv">💬</div><div style="flex:1;min-width:0"><strong id="chatName">Chat</strong><div class="meta" id="chatSub" style="margin:2px 0 0"></div></div></div>
   <div id="messages">
    <div class="message">Hey! Are you joining the activity?</div>
    <div class="message mine">Yes! See you there.</div>
   </div>
-  <div class="chatbox"><input id="chatInput" placeholder="Type a message..."><button class="btn" onclick="sendMessage()">➤</button></div>
+  <div class="chatbox"><input id="chatInput" placeholder="Type a message..." autocomplete="off" maxlength="1000"><button class="btn" type="button" onclick="sendMessage()" aria-label="Send">➤</button></div>
   <p class="meta" id="chatNote">Demo chat — messages are not sent online yet.</p>
  </div>
 </section>
@@ -445,7 +457,7 @@ function browseAsGuest(){document.body.classList.add('authed','guest');showPage(
 function needLogin(reason){showAuth('signin');msg('siMsg','Please sign in to '+reason+'.','');}
 let recovering=/type=recovery/.test(location.hash);
 let appUserId=null;
-let myProfile={},live=[],counts={},joined=new Set(),mine=[],names={},chatActivity=null,chatTimer=null;
+let chatSig='',chatForce=false,myProfile={},live=[],counts={},joined=new Set(),mine=[],names={},chatActivity=null,chatTimer=null;
 
 function showAuth(name){
  document.body.classList.remove('authed');
@@ -649,33 +661,61 @@ $('createForm').addEventListener('submit',async function(e){
  f.reset();showPage('home');loadLive();
 });
 const demoHTML=$('messages').innerHTML;
-function showChatWindow(name,note){$('realChats').style.display='none';$('chatList').style.display='none';$('chatWindow').style.display='block';$('chatName').textContent=name;$('chatNote').textContent=note;}
+function showChatWindow(name,note,icon,sub){
+ $('realChats').style.display='none';$('chatList').style.display='none';$('chatWindow').style.display='block';$('chat').classList.add('chatopen');
+ $('chatName').textContent=name;$('chatNote').textContent=note;$('chatAv').textContent=icon||'💬';$('chatSub').textContent=sub||'';
+}
 function openChat(name){
  chatActivity=null;clearInterval(chatTimer);
  $('messages').innerHTML=demoHTML;
- showChatWindow(name,'Demo chat — messages are not sent online yet.');
+ showChatWindow(name,'Demo chat — messages are not sent online yet.','👤','Sample conversation');
 }
 function closeChat(){
  clearInterval(chatTimer);chatActivity=null;
- $('chatWindow').style.display='none';$('chatList').style.display='block';$('realChats').style.display='';
+ $('chatWindow').style.display='none';$('chat').classList.remove('chatopen');$('chatList').style.display='block';$('realChats').style.display='';
 }
-function openActivityChat(id,title){
- clearInterval(chatTimer);chatActivity=id;
+function openActivityChat(id,title,a){
+ clearInterval(chatTimer);chatActivity=id;chatSig='';chatForce=true;
+ const act=a||mine.find(x=>x.id===id)||live.find(x=>x.id===id)||{};
+ const n=counts[id];
  $('messages').innerHTML='';
- showChatWindow(title,'Live group chat for this activity.');
+ showChatWindow(title,'Only members of this activity can see these messages.',ICON[(act.category||'').toLowerCase()]||'💬',(n!=null?n+' member'+(n===1?'':'s')+' · ':'')+'Live chat');
  loadMessages();chatTimer=setInterval(loadMessages,8000);
+}
+function dayLabel(d){
+ const t=new Date(),y=new Date();y.setDate(t.getDate()-1);
+ if(d.toDateString()===t.toDateString())return 'Today';
+ if(d.toDateString()===y.toDateString())return 'Yesterday';
+ return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 }
 async function loadMessages(){
  if(!chatActivity||!sb)return;
  const id=chatActivity;
  const r=await sb.from('messages').select('*').eq('activity_id',id).order('created_at',{ascending:true}).limit(200);
  if(id!==chatActivity)return;
- const box=$('messages');box.innerHTML='';
- if(r.error){box.appendChild(mk('div','empty','Could not load messages.'));console.warn('Messages:',r.error.message);return;}
+ const box=$('messages');
+ if(r.error){box.innerHTML='';box.appendChild(mk('div','empty','Could not load messages.'));console.warn('Messages:',r.error.message);return;}
+ const sig=r.data.length+':'+(r.data.length?r.data[r.data.length-1].id:'');
+ if(sig===chatSig&&!chatForce)return;
  const unknown=[...new Set(r.data.map(m=>m.sender_id))].filter(x=>x&&!names[x]);
  if(unknown.length){const p=await sb.from('profiles').select('id,full_name,username').in('id',unknown);(p.data||[]).forEach(x=>{names[x.id]=x.full_name||x.username||'Member';});}
- if(!r.data.length){box.appendChild(mk('div','empty','No messages yet. Say hello!'));return;}
- r.data.forEach(m=>{const mine=m.sender_id===appUserId;const d=mk('div','message'+(mine?' mine':''));if(!mine)d.appendChild(mk('div','meta',names[m.sender_id]||'Member'));d.appendChild(mk('div','',m.content));box.appendChild(d);});
+ if(id!==chatActivity)return;
+ const near=box.scrollHeight-box.scrollTop-box.clientHeight<80;
+ chatSig=sig;box.innerHTML='';
+ if(!r.data.length){box.appendChild(mk('div','empty','No messages yet. Say hello! 👋'));chatForce=false;return;}
+ let lastDay='',lastSender=null;
+ r.data.forEach(m=>{
+  const dt=new Date(m.created_at),dl=dayLabel(dt);
+  if(dl!==lastDay){box.appendChild(mk('div','dsep',dl));lastDay=dl;lastSender=null;}
+  const mineMsg=m.sender_id===appUserId;
+  const d=mk('div','message'+(mineMsg?' mine':''));
+  if(!mineMsg&&m.sender_id!==lastSender)d.appendChild(mk('div','who',names[m.sender_id]||'Member'));
+  d.appendChild(mk('div','',m.content));
+  d.appendChild(mk('div','tm',dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})));
+  box.appendChild(d);lastSender=m.sender_id;
+ });
+ if(chatForce||near)box.scrollTop=box.scrollHeight;
+ chatForce=false;
 }
 async function sendMessage(){
  const input=$('chatInput');const text=input.value.trim();
@@ -685,12 +725,13 @@ async function sendMessage(){
   input.value='';
   const r=await sb.from('messages').insert({sender_id:appUserId,activity_id:chatActivity,content:text});
   if(r.error){toast('Message not sent: '+r.error.message);input.value=text;return;}
-  loadMessages();return;
+  chatForce=true;loadMessages();input.focus();return;
  }
  const m=document.createElement('div');
  m.className='message mine';m.textContent=text;
- $('messages').appendChild(m);input.value='';
+ $('messages').appendChild(m);input.value='';$('messages').scrollTop=$('messages').scrollHeight;
 }
+$('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
 
 /* date and time pickers: open on tap, no past dates */
 ['activityDate','activityTime'].forEach(id=>{const el=$(id);el.addEventListener('click',()=>{try{if(el.showPicker)el.showPicker();}catch(e){}});});
@@ -746,10 +787,16 @@ function liveCard(a){
  b.appendChild(mk('div','meta','📍 '+(a.location||'Islamabad')));
  const w=when(a);if(w)b.appendChild(mk('div','meta','🗓 '+w));
  const act=mk('div','card-actions');
- act.appendChild(mk('span','count',appUserId?(counts[a.id]||0)+' joined'+(a.is_public===false?' · Private':''):'Open to join'));
- const btn=mk('button','btn small',joined.has(a.id)?'Joined ✓':'Join');
- btn.type='button';btn.onclick=()=>joinLive(a.id,btn);
- act.appendChild(btn);b.appendChild(act);c.appendChild(b);return c;
+ act.appendChild(mk('span','count',appUserId?(counts[a.id]||0)+' joined'+(joined.has(a.id)?' · You ✓':'')+(a.is_public===false?' · Private':''):'Open to join'));
+ const row=mk('div','');row.style.cssText='display:flex;gap:6px';
+ if(joined.has(a.id)){
+  const ch=mk('button','btn small','Chat');ch.type='button';ch.onclick=()=>{showPage('chat');openActivityChat(a.id,a.title||'Activity chat',a);};
+  const lv=mk('button','btn secondary small','Leave');lv.type='button';lv.onclick=()=>{if(confirm('Leave this activity?'))joinLive(a.id,lv);};
+  row.appendChild(ch);row.appendChild(lv);
+ }else{
+  const btn=mk('button','btn small','Join');btn.type='button';btn.onclick=()=>joinLive(a.id,btn);row.appendChild(btn);
+ }
+ act.appendChild(row);b.appendChild(act);c.appendChild(b);return c;
 }
 function renderLive(){
  ['liveGrid','liveGridX'].forEach(id=>{const g=$(id);g.innerHTML='';live.forEach(a=>g.appendChild(liveCard(a)));});
