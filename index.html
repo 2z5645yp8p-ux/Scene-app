@@ -369,10 +369,20 @@ body.guest .backwel{display:none}
  <div class="profile-top">
   <div class="avatar" id="profAvatar">👤</div><h2 style="margin:12px 0 4px" id="profName">Your Name</h2>
   <div class="purple" id="profHandle">@yourusername</div><p id="profEmail" style="margin:6px 0 0;font-size:13px">Explore · Connect · Enjoy</p>
+  <p id="profMeta" style="margin:4px 0 0;font-size:13px"></p>
   <div class="stats"><div><strong>0</strong><span>Posts</span></div><div><strong>0</strong><span>Followers</span></div><div><strong>0</strong><span>Following</span></div></div>
-  <button class="btn secondary small" onclick="alert('Profile editing will be connected with accounts later.')">Edit Profile</button>
+  <button class="btn secondary small" onclick="openEdit()">Edit Profile</button>
   <button class="btn secondary small" id="logoutBtn" style="margin-left:6px">Log Out</button>
  </div>
+ <form class="form" id="editForm" style="display:none" novalidate>
+  <h2 style="margin:0 0 4px">Edit Profile</h2>
+  <div class="field"><label for="efName">Full Name</label><input id="efName" maxlength="60" autocomplete="name"></div>
+  <div class="field"><label for="efUser">Username</label><input id="efUser" maxlength="20" autocapitalize="none" placeholder="e.g. ali_ahmad"><p class="hint">3-20 characters: letters, numbers, _ or .</p></div>
+  <div class="field"><label for="efCity">City</label><input id="efCity" maxlength="40" placeholder="Islamabad"></div>
+  <div class="field"><label for="efBio">Bio</label><textarea id="efBio" maxlength="160" placeholder="Tell people about yourself..."></textarea></div>
+  <div class="msg" id="efMsg" role="alert"></div>
+  <div class="row2"><button class="btn" type="submit" id="efSave">Save</button><button class="btn secondary" type="button" onclick="$('editForm').style.display='none'">Cancel</button></div>
+ </form>
  <h2>Your Activities</h2>
  <div class="empty" id="myActs">Your created and joined activities will appear here.</div>
 </section>
@@ -435,7 +445,7 @@ function browseAsGuest(){document.body.classList.add('authed','guest');showPage(
 function needLogin(reason){showAuth('signin');msg('siMsg','Please sign in to '+reason+'.','');}
 let recovering=/type=recovery/.test(location.hash);
 let appUserId=null;
-let live=[],counts={},joined=new Set(),mine=[],names={},chatActivity=null,chatTimer=null;
+let myProfile={},live=[],counts={},joined=new Set(),mine=[],names={},chatActivity=null,chatTimer=null;
 
 function showAuth(name){
  document.body.classList.remove('authed');
@@ -477,9 +487,10 @@ async function loadProfile(user){
  try{
   const r=await sb.from('profiles').select('*').eq('id',user.id).maybeSingle();
   if(r.error)throw r.error;
+  myProfile=r.data||{full_name:name};
   if(r.data){name=r.data.full_name||r.data.name||name;handle=r.data.username||handle;}
   else{const u=await sb.from('profiles').upsert({id:user.id,full_name:name},{onConflict:'id'});if(u.error)throw u.error;}
-  paintProfile(name,handle,user.email||'');
+  paintProfile(name,handle,user.email||'');paintExtra();
  }catch(e){console.warn('Profile sync skipped:',e.message||e);}
 }
 function enterApp(user){
@@ -492,7 +503,7 @@ function enterApp(user){
  loadLive();
 }
 function leaveApp(){
- appUserId=null;mine=[];joined=new Set();closeChat();renderMine();renderChats();
+ appUserId=null;mine=[];joined=new Set();closeChat();renderMine();renderChats();myProfile={};$('editForm').style.display='none';$('profMeta').textContent='';
  ['siPass','suPass','suPass2','rpPass','rpPass2'].forEach(i=>{$(i).value='';});
  if(isDesktop())browseAsGuest();else showAuth('welcome');
 }
@@ -684,6 +695,37 @@ async function sendMessage(){
 /* date and time pickers: open on tap, no past dates */
 ['activityDate','activityTime'].forEach(id=>{const el=$(id);el.addEventListener('click',()=>{try{if(el.showPicker)el.showPicker();}catch(e){}});});
 (function(){const d=new Date(),p=n=>String(n).padStart(2,'0');$('activityDate').min=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());})();
+
+/* ============ EDIT PROFILE ============ */
+function paintExtra(){
+ const b=myProfile||{};
+ const loc=b.city?'📍 '+b.city:'';
+ $('profMeta').textContent=[loc,b.bio].filter(Boolean).join(' — ');
+}
+function openEdit(){
+ if(!sb||!appUserId){needLogin('edit your profile');return;}
+ const b=myProfile||{};
+ $('efName').value=b.full_name||'';$('efUser').value=b.username||'';$('efCity').value=b.city||'';$('efBio').value=b.bio||'';
+ msg('efMsg','');$('editForm').style.display='block';
+ $('editForm').scrollIntoView({behavior:'smooth',block:'start'});
+}
+$('editForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ if(!sb||!appUserId){needLogin('edit your profile');return;}
+ const name=$('efName').value.trim(),user=$('efUser').value.trim().toLowerCase().replace(/^@/,''),city=$('efCity').value.trim(),bio=$('efBio').value.trim();
+ if(name.length<2)return msg('efMsg','Enter your full name.','err');
+ if(user&&!/^[a-z0-9_.]{3,20}$/.test(user))return msg('efMsg','Username must be 3-20 characters: letters, numbers, _ or .','err');
+ busy('efSave',true,'Saving…');msg('efMsg','');
+ const row={id:appUserId,full_name:name,city:city||null,bio:bio||null};
+ if(user)row.username=user;
+ const r=await sb.from('profiles').upsert(row,{onConflict:'id'});
+ busy('efSave',false);
+ if(r.error)return msg('efMsg',r.error.code==='23505'?'That username is already taken. Try another.':'Could not save: '+r.error.message,'err');
+ myProfile=Object.assign({},myProfile,row);names[appUserId]=name;
+ const email=$('profEmail').textContent;
+ paintProfile(name,myProfile.username||(email.split('@')[0]||'user'),email);paintExtra();
+ $('editForm').style.display='none';toast('Profile updated');
+});
 
 /* ============ LIVE DATA (Supabase) ============ */
 function mk(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
