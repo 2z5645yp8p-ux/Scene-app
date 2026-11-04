@@ -157,6 +157,8 @@ body.guest .backbrowse{display:inline-block;margin-top:8px}
 body.guest .backwel{display:none}
 @media(min-width:900px){header{gap:18px}}
 .sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.field input[type=date],.field input[type=time]{color-scheme:dark;min-height:48px;cursor:pointer;-webkit-appearance:none;appearance:none}
+.field input[type=date]::-webkit-calendar-picker-indicator,.field input[type=time]::-webkit-calendar-picker-indicator{filter:invert(1);opacity:.9;cursor:pointer}
 </style>
 </head>
 <body>
@@ -678,6 +680,10 @@ async function sendMessage(){
  m.className='message mine';m.textContent=text;
  $('messages').appendChild(m);input.value='';
 }
+
+/* date and time pickers: open on tap, no past dates */
+['activityDate','activityTime'].forEach(id=>{const el=$(id);el.addEventListener('click',()=>{try{if(el.showPicker)el.showPicker();}catch(e){}});});
+(function(){const d=new Date(),p=n=>String(n).padStart(2,'0');$('activityDate').min=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());})();
 
 /* ============ LIVE DATA (Supabase) ============ */
 function mk(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
