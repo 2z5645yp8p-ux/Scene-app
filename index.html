@@ -172,6 +172,16 @@ body.guest .backwel{display:none}
 .chatbox input:focus{border-color:#a65aff}
 .chatbox .btn{border-radius:50%;width:44px;height:44px;padding:0;flex:none}
 #chat.chatopen>.tag,#chat.chatopen>h1,#chat.chatopen>p{display:none}
+@media(max-width:899px){
+ body.chatting{overflow:hidden}
+ body.chatting .bottom{display:none}
+ #chat.chatopen #chatWindow{position:fixed;left:0;right:0;top:0;bottom:0;z-index:40;background:var(--bg);display:flex!important;flex-direction:column}
+ #chat.chatopen .chathead{border-radius:0;border-left:0;border-right:0;border-top:0;flex:none}
+ #chat.chatopen #messages{flex:1;height:auto;min-height:0;border-left:0;border-right:0}
+ #chat.chatopen .chatbox{flex:none;border-radius:0;border-left:0;border-right:0;border-bottom:0;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+ #chat.chatopen #chatNote{display:none}
+}
+.chatbox input{font-size:16px}
 </style>
 </head>
 <body>
@@ -661,8 +671,16 @@ $('createForm').addEventListener('submit',async function(e){
  f.reset();showPage('home');loadLive();
 });
 const demoHTML=$('messages').innerHTML;
+function fitChat(){
+ const w=$('chatWindow');
+ if(!document.body.classList.contains('chatting')||window.innerWidth>=900){w.style.top='';w.style.height='';w.style.bottom='';return;}
+ const v=window.visualViewport;
+ if(v){w.style.bottom='auto';w.style.top=v.offsetTop+'px';w.style.height=v.height+'px';}
+ const m=$('messages');m.scrollTop=m.scrollHeight;
+}
+if(window.visualViewport){visualViewport.addEventListener('resize',fitChat);visualViewport.addEventListener('scroll',fitChat);}
 function showChatWindow(name,note,icon,sub){
- $('realChats').style.display='none';$('chatList').style.display='none';$('chatWindow').style.display='block';$('chat').classList.add('chatopen');
+ $('realChats').style.display='none';$('chatList').style.display='none';$('chatWindow').style.display='block';$('chat').classList.add('chatopen');document.body.classList.add('chatting');fitChat();
  $('chatName').textContent=name;$('chatNote').textContent=note;$('chatAv').textContent=icon||'💬';$('chatSub').textContent=sub||'';
 }
 function openChat(name){
@@ -672,7 +690,7 @@ function openChat(name){
 }
 function closeChat(){
  clearInterval(chatTimer);chatActivity=null;
- $('chatWindow').style.display='none';$('chat').classList.remove('chatopen');$('chatList').style.display='block';$('realChats').style.display='';
+ $('chatWindow').style.display='none';$('chat').classList.remove('chatopen');document.body.classList.remove('chatting');fitChat();$('chatList').style.display='block';$('realChats').style.display='';
 }
 function openActivityChat(id,title,a){
  clearInterval(chatTimer);chatActivity=id;chatSig='';chatForce=true;
