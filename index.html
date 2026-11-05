@@ -188,6 +188,9 @@ body.guest .backwel{display:none}
 .badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:20px;background:#2a1d4d;color:#c9b9e6}
 .badge.ok{background:#12301f;color:#6ee7a8}.badge.wait{background:#33280f;color:#ffc64d}.badge.bad{background:#34131f;color:#ff8097}
 .bizrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:14px;margin:10px 0}
+.hright{display:flex;align-items:center;gap:14px}
+.crownbtn{background:#2a1d10;border:1px solid #95651c;border-radius:50%;width:38px;height:38px;font-size:19px;line-height:1;padding:0;display:grid;place-items:center}
+@media(min-width:900px){.crownbtn{display:none}}
 </style>
 </head>
 <body>
@@ -280,7 +283,7 @@ body.guest .backwel{display:none}
 <div class="app">
 <header>
  <div class="brand"><div class="logo" role="img" aria-label="SCENE logo"></div> SCENE</div>
- <div class="location">📍 Islamabad <span class="purple">⌄</span></div>
+ <div class="hright"><button class="crownbtn" type="button" onclick="showPage('premium')" aria-label="Premium">👑</button><div class="location">📍 Islamabad <span class="purple">⌄</span></div></div>
  <div class="guestbtns"><button class="btn secondary small" type="button" onclick="showAuth('signin')">Sign In</button><button class="btn small" type="button" onclick="showAuth('signup')">Create Account</button></div>
 </header>
 
@@ -403,6 +406,7 @@ body.guest .backwel{display:none}
   <div class="stats"><div><strong>0</strong><span>Posts</span></div><div><strong>0</strong><span>Followers</span></div><div><strong>0</strong><span>Following</span></div></div>
   <button class="btn secondary small" onclick="openEdit()">Edit Profile</button>
   <button class="btn secondary small" id="logoutBtn" style="margin-left:6px">Log Out</button>
+  <div style="margin-top:12px"><button class="btn gold small" type="button" onclick="showPage('premium')">👑 Go Premium</button></div>
  </div>
  <form class="form" id="editForm" style="display:none" novalidate>
   <h2 style="margin:0 0 4px">Edit Profile</h2>
