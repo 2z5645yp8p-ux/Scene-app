@@ -191,6 +191,19 @@ body.guest .backwel{display:none}
 .hright{display:flex;align-items:center;gap:14px}
 .crownbtn{background:#2a1d10;border:1px solid #95651c;border-radius:50%;width:38px;height:38px;font-size:19px;line-height:1;padding:0;display:grid;place-items:center}
 @media(min-width:900px){.crownbtn{display:none}}
+.bhero{padding:28px;border-radius:23px;background:linear-gradient(100deg,#26104b,#15102d 60%,#38145e);border:1px solid #55318a}
+.bhero h1{font-size:30px;max-width:520px}.bhero p{max-width:520px;color:#ddd5f2}
+.bhero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.fgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.fitem{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px}
+.fitem h3{font-size:15px;margin:10px 0 6px}.fitem p{font-size:13px;margin:0 0 10px}
+.ficon{width:42px;height:42px;border-radius:12px;background:linear-gradient(140deg,#3a1a6e,#1d1233);display:grid;place-items:center;font-size:21px}
+.steps{display:grid;gap:10px}
+.step{display:flex;gap:14px;align-items:flex-start;background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px}
+.step p{margin:4px 0 0;font-size:13px}
+.num{flex:none;width:30px;height:30px;border-radius:50%;background:linear-gradient(140deg,#a239ff,#651dff);display:grid;place-items:center;font-weight:800;font-size:14px}
+@media(min-width:900px){.fgrid{grid-template-columns:repeat(4,1fr)}.fgrid.f3{grid-template-columns:repeat(3,1fr)}.steps{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:520px){.bhero{padding:22px}.bhero h1{font-size:25px}.fgrid.f3{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -406,7 +419,7 @@ body.guest .backwel{display:none}
   <div class="stats"><div><strong>0</strong><span>Posts</span></div><div><strong>0</strong><span>Followers</span></div><div><strong>0</strong><span>Following</span></div></div>
   <button class="btn secondary small" onclick="openEdit()">Edit Profile</button>
   <button class="btn secondary small" id="logoutBtn" style="margin-left:6px">Log Out</button>
-  <div style="margin-top:12px"><button class="btn gold small" type="button" onclick="showPage('premium')">👑 Go Premium</button></div>
+  <div style="margin-top:12px"><button class="btn gold small" type="button" onclick="showPage('premium')">👑 Go Premium</button> <button class="btn secondary small" type="button" onclick="showPage('business')">🏪 For Business</button></div>
  </div>
  <form class="form" id="editForm" style="display:none" novalidate>
   <h2 style="margin:0 0 4px">Edit Profile</h2>
@@ -434,15 +447,38 @@ body.guest .backwel{display:none}
   <div class="feature">✓ Ad-free experience</div>
   <button class="btn gold full" onclick="alert('Premium payment is not connected in this demo.')">Explore Premium</button>
  </div>
- <h2>Business Growth with SCENE</h2>
- <p>Help your cafe, restaurant or brand reach more local people.</p>
- <div class="business-grid">
-  <div class="business-item"><div style="font-size:25px">📣</div><h3>Featured Listing</h3><p>Promote your deals and events.</p><strong>From Rs. 500</strong></div>
-  <div class="business-item"><div style="font-size:25px">🏪</div><h3>Business Profile</h3><p>Showcase your local business.</p><strong>Plans coming soon</strong></div>
-  <div class="business-item"><div style="font-size:25px">🚀</div><h3>Activity Boost</h3><p>Reach more people nearby.</p><strong>From Rs. 100</strong></div>
-  <div class="business-item"><div style="font-size:25px">📊</div><h3>Promotion Insights</h3><p>Understand your reach.</p><strong>Business plans</strong></div>
+ <h2>Own a business?</h2>
+ <p>Promote your cafe, shop or events to people across Islamabad.</p>
+ <button class="btn secondary" type="button" onclick="showPage('business')">🏪 For Business →</button>
+</section>
+<!-- BUSINESS -->
+<section id="business" class="page">
+ <div class="bhero">
+  <div class="tag">FOR BUSINESSES</div>
+  <h1>Grow your business with <span class="purple">SCENE.</span></h1>
+  <p>Reach people in Islamabad who are looking for things to do. Promote your cafe, shop or events to the right audience.</p>
+  <div class="bhero-actions"><button class="btn" type="button" onclick="bizAction('register')">Register your business</button><button class="btn secondary" type="button" onclick="bizAction('promo')">Request a promotion</button></div>
  </div>
- <p class="meta">Prices shown are proposed demo prices, not active offers.</p>
+ <h2>Why SCENE</h2>
+ <div class="fgrid">
+  <div class="fitem"><div class="ficon">📍</div><h3>Local audience</h3><p>People in your city, discovering activities and places nearby.</p></div>
+  <div class="fitem"><div class="ficon">⭐</div><h3>Featured placement</h3><p>Show your business at the top of Home.</p></div>
+  <div class="fitem"><div class="ficon">🚀</div><h3>Activity Boost</h3><p>Push your events and meetups to more people.</p></div>
+  <div class="fitem"><div class="ficon">📊</div><h3>Insights</h3><p>Understand your reach and results.</p><span class="badge">Coming soon</span></div>
+ </div>
+ <h2>How it works</h2>
+ <div class="steps">
+  <div class="step"><span class="num">1</span><div><strong>Register your business</strong><p>Add your name, category and address. The SCENE team reviews it.</p></div></div>
+  <div class="step"><span class="num">2</span><div><strong>Choose a promotion</strong><p>Request a Featured Listing, or boost one of your activities.</p></div></div>
+  <div class="step"><span class="num">3</span><div><strong>Go live</strong><p>We confirm the price and dates with you, then you appear on SCENE.</p></div></div>
+ </div>
+ <h2>Plans</h2>
+ <div class="fgrid f3">
+  <div class="fitem"><div class="ficon">⭐</div><h3>Featured Listing</h3><p>Your business shown on Home.</p><strong>From Rs. 500</strong></div>
+  <div class="fitem"><div class="ficon">🚀</div><h3>Activity Boost</h3><p>Your activity shown first.</p><strong>From Rs. 100</strong></div>
+  <div class="fitem"><div class="ficon">🏪</div><h3>Business Profile</h3><p>A full page for your business.</p><strong>Plans coming soon</strong></div>
+ </div>
+ <p class="meta">Prices are proposed demo prices, not active offers. Nothing is charged in the app. Payment is confirmed directly with the SCENE team.</p>
  <h2>Your Business</h2>
  <div id="bizBox"></div>
 </section>
@@ -458,6 +494,7 @@ body.guest .backwel{display:none}
  <button class="nav" data-page="chat" onclick="showPage('chat',this)"><b>▢</b>Chat</button>
  <button class="nav" data-page="profile" onclick="showPage('profile',this)"><b>♙</b>Profile</button>
  <button class="nav deskonly" data-page="premium" onclick="showPage('premium',this)"><b>👑</b>Premium</button>
+ <button class="nav deskonly" data-page="business" onclick="showPage('business',this)"><b>🏪</b>For Business</button>
 </nav>
 <div id="editActModal" class="modal" style="display:none">
  <form class="form" id="editActForm" novalidate>
@@ -945,6 +982,10 @@ async function loadBiz(){
   myBiz=b.data||[];myPromos=p.data||[];renderBiz();
  }catch(e){console.warn('Business data not loaded:',e.message||e);}
 }
+function bizAction(k){
+ if(!sb||!appUserId){needLogin(k==='register'?'register your business':'request a promotion');return;}
+ if(k==='register')openBiz();else openPromo();
+}
 function openBiz(){['bzName','bzDesc','bzAddr'].forEach(i=>{$(i).value='';});msg('bzMsg','');$('bizModal').style.display='flex';}
 $('bizModal').addEventListener('click',e=>{if(e.target===$('bizModal'))$('bizModal').style.display='none';});
 $('promoModal').addEventListener('click',e=>{if(e.target===$('promoModal'))$('promoModal').style.display='none';});
@@ -965,7 +1006,18 @@ function openPromo(){
  const bs=myBiz.filter(b=>b.is_approved!==false),as=mine.filter(a=>a.creator_id===appUserId);
  const fill=(sel,items,lab)=>{sel.innerHTML='';items.forEach(x=>{const o=document.createElement('option');o.value=x.id;o.textContent=lab(x);sel.appendChild(o);});};
  fill($('prBiz'),bs,b=>b.name);fill($('prAct'),as,a=>a.title);
- msg('prMsg','');$('prType').value=bs.length?'featured_listing':'activity_boost';togglePromoType();
+ const hasB=bs.length>0,hasA=as.length>0;
+ const oF=$('prType').querySelector('option[value=featured_listing]'),oA=$('prType').querySelector('option[value=activity_boost]');
+ oF.disabled=!hasB;oA.disabled=!hasA;
+ oF.textContent='Featured Listing (a business)'+(hasB?'':' - not available yet');
+ oA.textContent='Activity Boost (one of my activities)'+(hasA?'':' - not available yet');
+ $('prType').value=hasB?'featured_listing':'activity_boost';togglePromoType();
+ $('prSave').disabled=!hasB&&!hasA;
+ let note='';
+ if(!hasB&&!hasA)note=myBiz.length?'Your business is still waiting for approval, and you have no activity of your own yet. Create an activity or wait for approval.':'To request a promotion you need an approved business or an activity you created. Register a business first, or create an activity.';
+ else if(!hasB)note=myBiz.length?'Your business is still waiting for approval. Only Activity Boost is available for now.':'Register a business to request a Featured Listing. Only Activity Boost is available for now.';
+ else if(!hasA)note='Only Featured Listing is available. Create an activity to boost it.';
+ msg('prMsg',note,'');
  $('promoModal').style.display='flex';
 }
 function togglePromoType(){const f=$('prType').value==='featured_listing';$('prBizF').style.display=f?'':'none';$('prActF').style.display=f?'none':'';}
