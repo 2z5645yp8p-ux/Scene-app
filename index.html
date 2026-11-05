@@ -182,6 +182,12 @@ body.guest .backwel{display:none}
  #chat.chatopen #chatNote{display:none}
 }
 .chatbox input{font-size:16px}
+.modal{position:fixed;inset:0;z-index:150;background:#000b;align-items:flex-start;justify-content:center;overflow:auto;padding:20px}
+.modal .form{width:100%;max-width:520px;margin:auto}
+.btn.danger{background:#34131f;border:1px solid #6b2236;color:#ff8097;box-shadow:none}
+.badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:20px;background:#2a1d4d;color:#c9b9e6}
+.badge.ok{background:#12301f;color:#6ee7a8}.badge.wait{background:#33280f;color:#ffc64d}.badge.bad{background:#34131f;color:#ff8097}
+.bizrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:14px;margin:10px 0}
 </style>
 </head>
 <body>
@@ -292,6 +298,7 @@ body.guest .backwel{display:none}
   <p>Discover events, meet people, explore places and be part of something exciting.</p>
   <div><button class="btn" onclick="showPage('explore')">Explore Now →</button></div>
  </div>
+ <div id="featWrap" style="display:none"><div class="section-head"><h2>⭐ Featured</h2></div><div class="grid" id="featGrid"></div></div>
  <div class="section-head"><h2>Live Activities</h2><button class="btn secondary small" type="button" onclick="loadLive()">Refresh</button></div>
  <p class="note" id="liveMsg">Loading activities…</p>
  <div class="grid" id="liveGrid"></div>
@@ -358,6 +365,7 @@ body.guest .backwel{display:none}
   <div class="field"><label>Date</label><input type="date" id="activityDate" required></div>
   <div class="field"><label>Time</label><input type="time" id="activityTime" required></div>
   <div class="field"><label>Location</label><input id="activityLocation" required placeholder="e.g. F-9 Park, Islamabad"></div>
+  <div class="field"><label>Max members (optional)</label><input type="number" id="activityMax" min="2" max="500" inputmode="numeric" placeholder="Leave empty for no limit"></div>
   <div class="field"><label>Who can join?</label><select id="activityPrivacy"><option>Public — Everyone can join</option><option>Private — Invite only</option></select></div>
   <button class="btn full" type="submit">＋ Publish Activity</button>
  </form>
@@ -431,6 +439,8 @@ body.guest .backwel{display:none}
   <div class="business-item"><div style="font-size:25px">📊</div><h3>Promotion Insights</h3><p>Understand your reach.</p><strong>Business plans</strong></div>
  </div>
  <p class="meta">Prices shown are proposed demo prices, not active offers.</p>
+ <h2>Your Business</h2>
+ <div id="bizBox"></div>
 </section>
 </main>
 
@@ -445,6 +455,44 @@ body.guest .backwel{display:none}
  <button class="nav" data-page="profile" onclick="showPage('profile',this)"><b>♙</b>Profile</button>
  <button class="nav deskonly" data-page="premium" onclick="showPage('premium',this)"><b>👑</b>Premium</button>
 </nav>
+<div id="editActModal" class="modal" style="display:none">
+ <form class="form" id="editActForm" novalidate>
+  <h2 style="margin:0 0 4px">Edit Activity</h2>
+  <div class="field"><label for="eaTitle">Title</label><input id="eaTitle" maxlength="80"></div>
+  <div class="field"><label for="eaType">Type</label><select id="eaType"><option>Sports</option><option>Hangout</option><option>Event</option><option>Study Group</option><option>Gaming</option></select></div>
+  <div class="field"><label for="eaDesc">Description</label><textarea id="eaDesc"></textarea></div>
+  <div class="field"><label for="eaDate">Date</label><input type="date" id="eaDate"></div>
+  <div class="field"><label for="eaTime">Time</label><input type="time" id="eaTime"></div>
+  <div class="field"><label for="eaLoc">Location</label><input id="eaLoc" maxlength="120"></div>
+  <div class="field"><label for="eaMax">Max members (optional)</label><input type="number" id="eaMax" min="2" max="500" inputmode="numeric" placeholder="Leave empty for no limit"></div>
+  <div class="field"><label for="eaPub">Who can join?</label><select id="eaPub"><option value="1">Public — Everyone can join</option><option value="0">Private — Invite only</option></select></div>
+  <div class="msg" id="eaMsg" role="alert"></div>
+  <div class="row2"><button class="btn" type="submit" id="eaSave">Save Changes</button><button class="btn secondary" type="button" onclick="closeEditAct()">Cancel</button></div>
+ </form>
+</div>
+<div id="bizModal" class="modal" style="display:none">
+ <form class="form" id="bizForm" novalidate>
+  <h2 style="margin:0 0 4px">Register your business</h2>
+  <p style="margin:0 0 6px;font-size:13px">New businesses are reviewed by the SCENE team before they appear publicly.</p>
+  <div class="field"><label for="bzName">Business name</label><input id="bzName" maxlength="80"></div>
+  <div class="field"><label for="bzCat">Category</label><select id="bzCat"><option>Cafe</option><option>Restaurant</option><option>Shop</option><option>Sports &amp; Fitness</option><option>Events</option><option>Other</option></select></div>
+  <div class="field"><label for="bzDesc">Description</label><textarea id="bzDesc" maxlength="400" placeholder="What does your business offer?"></textarea></div>
+  <div class="field"><label for="bzAddr">Address</label><input id="bzAddr" maxlength="150" placeholder="e.g. F-8 Markaz, Islamabad"></div>
+  <div class="msg" id="bzMsg" role="alert"></div>
+  <div class="row2"><button class="btn" type="submit" id="bzSave">Submit for review</button><button class="btn secondary" type="button" onclick="$('bizModal').style.display='none'">Cancel</button></div>
+ </form>
+</div>
+<div id="promoModal" class="modal" style="display:none">
+ <form class="form" id="promoForm" novalidate>
+  <h2 style="margin:0 0 4px">Request a promotion</h2>
+  <p style="margin:0 0 6px;font-size:13px">Nothing is charged here. The SCENE team reviews your request and confirms the price and dates with you.</p>
+  <div class="field"><label for="prType">What do you want to promote?</label><select id="prType"><option value="featured_listing">Featured Listing (a business)</option><option value="activity_boost">Activity Boost (one of my activities)</option></select></div>
+  <div class="field" id="prBizF"><label for="prBiz">Business</label><select id="prBiz"></select></div>
+  <div class="field" id="prActF" style="display:none"><label for="prAct">Activity</label><select id="prAct"></select></div>
+  <div class="msg" id="prMsg" role="alert"></div>
+  <div class="row2"><button class="btn" type="submit" id="prSave">Send request</button><button class="btn secondary" type="button" onclick="$('promoModal').style.display='none'">Cancel</button></div>
+ </form>
+</div>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -467,7 +515,7 @@ function browseAsGuest(){document.body.classList.add('authed','guest');showPage(
 function needLogin(reason){showAuth('signin');msg('siMsg','Please sign in to '+reason+'.','');}
 let recovering=/type=recovery/.test(location.hash);
 let appUserId=null;
-let chatSig='',chatForce=false,myProfile={},live=[],counts={},joined=new Set(),mine=[],names={},chatActivity=null,chatTimer=null;
+let boosted=new Set(),featBiz=[],myBiz=[],myPromos=[],chatSig='',chatForce=false,myProfile={},live=[],counts={},joined=new Set(),mine=[],names={},chatActivity=null,chatTimer=null;
 
 function showAuth(name){
  document.body.classList.remove('authed');
@@ -522,10 +570,10 @@ function enterApp(user){
  document.body.classList.add('authed');
  showPage('home');
  loadProfile(user);
- loadLive();
+ loadLive();loadBiz();
 }
 function leaveApp(){
- appUserId=null;mine=[];joined=new Set();closeChat();renderMine();renderChats();myProfile={};$('editForm').style.display='none';$('profMeta').textContent='';
+ appUserId=null;mine=[];joined=new Set();closeChat();renderMine();renderChats();myBiz=[];myPromos=[];renderBiz();myProfile={};$('editForm').style.display='none';$('profMeta').textContent='';
  ['siPass','suPass','suPass2','rpPass','rpPass2'].forEach(i=>{$(i).value='';});
  if(isDesktop())browseAsGuest();else showAuth('welcome');
 }
@@ -660,6 +708,8 @@ $('createForm').addEventListener('submit',async function(e){
  if(!sb||!appUserId){needLogin('create an activity');return;}
  const f=this,btn=f.querySelector('button[type=submit]');
  const row={creator_id:appUserId,title:$('activityTitle').value.trim(),description:$('activityDescription').value.trim(),category:$('activityType').value,location:$('activityLocation').value.trim(),city:'Islamabad',activity_date:$('activityDate').value,activity_time:$('activityTime').value,is_public:$('activityPrivacy').value.startsWith('Public')};
+ const mxRaw=$('activityMax').value.trim();
+ if(mxRaw){const mx=parseInt(mxRaw,10);if(!(mx>=2&&mx<=500)){msgEl.textContent='Max members must be between 2 and 500.';return;}row.max_members=mx;}
  const newId=crypto.randomUUID();row.id=newId;
  btn.disabled=true;
  const r=await sb.from('activities').insert(row);
@@ -786,6 +836,152 @@ $('editForm').addEventListener('submit',async e=>{
  $('editForm').style.display='none';toast('Profile updated');
 });
 
+/* ============ EDIT / DELETE ACTIVITY ============ */
+let editId=null;
+function openEditAct(a){
+ editId=a.id;
+ $('eaTitle').value=a.title||'';$('eaType').value=a.category||'Sports';$('eaDesc').value=a.description||'';
+ $('eaDate').value=a.activity_date||'';$('eaTime').value=a.activity_time?String(a.activity_time).slice(0,5):'';
+ $('eaLoc').value=a.location||'';$('eaMax').value=a.max_members||'';$('eaPub').value=a.is_public===false?'0':'1';
+ msg('eaMsg','');$('editActModal').style.display='flex';
+}
+function closeEditAct(){$('editActModal').style.display='none';editId=null;}
+$('editActModal').addEventListener('click',e=>{if(e.target===$('editActModal'))closeEditAct();});
+['eaDate','eaTime'].forEach(id=>{const el=$(id);el.addEventListener('click',()=>{try{if(el.showPicker)el.showPicker();}catch(e){}});});
+$('editActForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ if(!sb||!appUserId||!editId){return;}
+ const title=$('eaTitle').value.trim(),loc=$('eaLoc').value.trim(),date=$('eaDate').value,time=$('eaTime').value,mxRaw=$('eaMax').value.trim();
+ if(title.length<3)return msg('eaMsg','Enter a title (at least 3 characters).','err');
+ if(!loc)return msg('eaMsg','Enter a location.','err');
+ if(!date||!time)return msg('eaMsg','Choose a date and time.','err');
+ let mx=null;if(mxRaw){mx=parseInt(mxRaw,10);if(!(mx>=2&&mx<=500))return msg('eaMsg','Max members must be between 2 and 500.','err');}
+ const cur=(counts[editId]||0);
+ if(mx&&mx<cur)return msg('eaMsg','Already '+cur+' members joined. Max cannot be lower than that.','err');
+ busy('eaSave',true,'Saving…');msg('eaMsg','');
+ const row={title,category:$('eaType').value,description:$('eaDesc').value.trim(),location:loc,activity_date:date,activity_time:time,is_public:$('eaPub').value==='1',max_members:mx};
+ const r=await sb.from('activities').update(row).eq('id',editId).select('id');
+ busy('eaSave',false);
+ if(r.error)return msg('eaMsg','Could not save: '+r.error.message,'err');
+ if(!r.data||!r.data.length)return msg('eaMsg','Could not save. You can only edit your own activities.','err');
+ closeEditAct();toast('Activity updated');loadLive();
+});
+async function deleteAct(a){
+ if(!sb||!appUserId)return;
+ if(!confirm('Delete "'+(a.title||'this activity')+'"? Its members and chat will be removed. This cannot be undone.'))return;
+ const r=await sb.from('activities').delete().eq('id',a.id).select('id');
+ if(r.error){toast('Could not delete: '+r.error.message);return;}
+ if(!r.data||!r.data.length){toast('Could not delete. You can only delete your own activities.');return;}
+ if(chatActivity===a.id)closeChat();
+ toast('Activity deleted');loadLive();
+}
+
+/* ============ BUSINESS AND PROMOTIONS ============ */
+const PROMO_LABEL={featured_listing:'Featured Listing',activity_boost:'Activity Boost',business_profile:'Business Profile'};
+function badge(text,kind){return mk('span','badge '+(kind||''),text);}
+function promoBadge(st){const m={active:['Active','ok'],pending:['Pending review','wait'],rejected:['Rejected','bad'],cancelled:['Cancelled',''],expired:['Expired','']};const x=m[st]||[st||'Pending review','wait'];return badge(x[0],x[1]);}
+function renderFeatured(){
+ const g=$('featGrid');g.innerHTML='';
+ featBiz.forEach(b=>{
+  const c=mk('article','card');c.appendChild(mk('div','cover cafe','🏪'));
+  const bd=mk('div','card-body');bd.appendChild(mk('div','tag','⭐ Featured · '+(b.category||'Business')));
+  bd.appendChild(mk('h3','',b.name||'Business'));
+  if(b.address)bd.appendChild(mk('div','meta','📍 '+b.address));
+  if(b.description)bd.appendChild(mk('div','meta',b.description.length>90?b.description.slice(0,90)+'…':b.description));
+  c.appendChild(bd);g.appendChild(c);
+ });
+ $('featWrap').style.display=featBiz.length?'':'none';
+}
+async function loadFeatured(){
+ if(!sb)return;
+ try{
+  const pr=await sb.from('promotions').select('*').eq('status','active');
+  if(pr.error)throw pr.error;
+  const now=Date.now();
+  const act=(pr.data||[]).filter(x=>(!x.starts_at||new Date(x.starts_at)<=now)&&(!x.ends_at||new Date(x.ends_at)>=now));
+  boosted=new Set(act.filter(x=>x.activity_id).map(x=>x.activity_id));
+  const ids=[...new Set(act.filter(x=>x.business_id).map(x=>x.business_id))];
+  featBiz=[];
+  if(ids.length){const b=await sb.from('businesses').select('*').in('id',ids);if(!b.error)featBiz=(b.data||[]).filter(x=>x.is_approved!==false);}
+ }catch(e){console.warn('Featured not loaded:',e.message||e);boosted=new Set();featBiz=[];}
+}
+function renderBiz(){
+ const box=$('bizBox');box.innerHTML='';
+ if(!appUserId){
+  box.appendChild(mk('p','','Sign in to register your business and request promotions.'));
+  const b=mk('button','btn small','Sign in');b.type='button';b.onclick=()=>needLogin('register your business');box.appendChild(b);return;
+ }
+ myBiz.forEach(x=>{
+  const r=mk('div','bizrow');const l=mk('div','');
+  l.appendChild(mk('strong','',x.name));l.appendChild(mk('div','meta',[x.category,x.address].filter(Boolean).join(' · ')));
+  r.appendChild(l);r.appendChild(x.is_approved===false?badge('Pending approval','wait'):badge('Approved','ok'));box.appendChild(r);
+ });
+ const row=mk('div','');row.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin:10px 0';
+ const add=mk('button','btn small','＋ Register a business');add.type='button';add.onclick=openBiz;row.appendChild(add);
+ const rq=mk('button','btn secondary small','Request a promotion');rq.type='button';rq.onclick=openPromo;row.appendChild(rq);
+ box.appendChild(row);
+ if(myPromos.length){
+  box.appendChild(mk('h3','','Your promotion requests'));
+  myPromos.forEach(x=>{
+   const biz=myBiz.find(b=>b.id===x.business_id),ac=[...mine,...live].find(a=>a.id===x.activity_id);
+   const r=mk('div','bizrow');const l=mk('div','');
+   l.appendChild(mk('strong','',PROMO_LABEL[x.promotion_type]||x.promotion_type));
+   l.appendChild(mk('div','meta',(biz?biz.name:ac?ac.title:'')||''));r.appendChild(l);r.appendChild(promoBadge(x.status));box.appendChild(r);
+  });
+ }
+}
+async function loadBiz(){
+ const uid=appUserId;if(!sb||!uid)return;
+ try{
+  const b=await sb.from('businesses').select('*').eq('owner_id',uid).order('created_at',{ascending:false});
+  if(b.error)throw b.error;
+  const p=await sb.from('promotions').select('*').eq('owner_id',uid).order('created_at',{ascending:false});
+  if(p.error)throw p.error;
+  if(uid!==appUserId)return;
+  myBiz=b.data||[];myPromos=p.data||[];renderBiz();
+ }catch(e){console.warn('Business data not loaded:',e.message||e);}
+}
+function openBiz(){['bzName','bzDesc','bzAddr'].forEach(i=>{$(i).value='';});msg('bzMsg','');$('bizModal').style.display='flex';}
+$('bizModal').addEventListener('click',e=>{if(e.target===$('bizModal'))$('bizModal').style.display='none';});
+$('promoModal').addEventListener('click',e=>{if(e.target===$('promoModal'))$('promoModal').style.display='none';});
+$('bizForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ if(!sb||!appUserId){needLogin('register your business');return;}
+ const name=$('bzName').value.trim(),addr=$('bzAddr').value.trim();
+ if(name.length<2)return msg('bzMsg','Enter your business name.','err');
+ if(!addr)return msg('bzMsg','Enter your address.','err');
+ busy('bzSave',true,'Sending…');msg('bzMsg','');
+ const row={id:crypto.randomUUID(),owner_id:appUserId,name,category:$('bzCat').value,description:$('bzDesc').value.trim()||null,address:addr,city:'Islamabad'};
+ const r=await sb.from('businesses').insert(row);
+ busy('bzSave',false);
+ if(r.error)return msg('bzMsg','Could not submit: '+r.error.message,'err');
+ $('bizModal').style.display='none';toast('Submitted. We will review your business soon.');loadBiz();
+});
+function openPromo(){
+ const bs=myBiz.filter(b=>b.is_approved!==false),as=mine.filter(a=>a.creator_id===appUserId);
+ const fill=(sel,items,lab)=>{sel.innerHTML='';items.forEach(x=>{const o=document.createElement('option');o.value=x.id;o.textContent=lab(x);sel.appendChild(o);});};
+ fill($('prBiz'),bs,b=>b.name);fill($('prAct'),as,a=>a.title);
+ msg('prMsg','');$('prType').value=bs.length?'featured_listing':'activity_boost';togglePromoType();
+ $('promoModal').style.display='flex';
+}
+function togglePromoType(){const f=$('prType').value==='featured_listing';$('prBizF').style.display=f?'':'none';$('prActF').style.display=f?'none':'';}
+$('prType').addEventListener('change',togglePromoType);
+$('promoForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ if(!sb||!appUserId){needLogin('request a promotion');return;}
+ const f=$('prType').value==='featured_listing';
+ const target=f?$('prBiz').value:$('prAct').value;
+ if(!target)return msg('prMsg',f?'You need an approved business first.':'You need an activity of your own first.','err');
+ busy('prSave',true,'Sending…');msg('prMsg','');
+ const row={id:crypto.randomUUID(),owner_id:appUserId,promotion_type:$('prType').value,status:'pending'};
+ if(f)row.business_id=target;else row.activity_id=target;
+ const r=await sb.from('promotions').insert(row);
+ busy('prSave',false);
+ if(r.error)return msg('prMsg','Could not send: '+r.error.message,'err');
+ $('promoModal').style.display='none';toast('Request sent. We will contact you to confirm.');loadBiz();
+});
+renderBiz();
+
 /* ============ LIVE DATA (Supabase) ============ */
 function mk(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
 const ICON={sports:'🏏',hangout:'☕',event:'🎵','study group':'📚',gaming:'🎮'};
@@ -800,24 +996,35 @@ function liveCard(a){
  c.dataset.search=((a.title||'')+' '+cat+' '+(a.location||'')).toLowerCase();
  c.appendChild(mk('div','cover',ICON[cat.toLowerCase()]||'✨'));
  const b=mk('div','card-body');
- b.appendChild(mk('div','tag',cat));
+ b.appendChild(mk('div','tag',(boosted.has(a.id)?'⭐ Featured · ':'')+cat));
  b.appendChild(mk('h3','',a.title||'Untitled'));
  b.appendChild(mk('div','meta','📍 '+(a.location||'Islamabad')));
  const w=when(a);if(w)b.appendChild(mk('div','meta','🗓 '+w));
  const act=mk('div','card-actions');
- act.appendChild(mk('span','count',appUserId?(counts[a.id]||0)+' joined'+(joined.has(a.id)?' · You ✓':'')+(a.is_public===false?' · Private':''):'Open to join'));
+ act.appendChild(mk('span','count',appUserId?(counts[a.id]||0)+(a.max_members?'/'+a.max_members:'')+' joined'+(joined.has(a.id)?' · You ✓':'')+(a.is_public===false?' · Private':''):'Open to join'));
  const row=mk('div','');row.style.cssText='display:flex;gap:6px';
  if(joined.has(a.id)){
   const ch=mk('button','btn small','Chat');ch.type='button';ch.onclick=()=>{showPage('chat');openActivityChat(a.id,a.title||'Activity chat',a);};
   const lv=mk('button','btn secondary small','Leave');lv.type='button';lv.onclick=()=>{if(confirm('Leave this activity?'))joinLive(a.id,lv);};
   row.appendChild(ch);row.appendChild(lv);
  }else{
-  const btn=mk('button','btn small','Join');btn.type='button';btn.onclick=()=>joinLive(a.id,btn);row.appendChild(btn);
+  const full=a.max_members&&(counts[a.id]||0)>=a.max_members;
+  const btn=mk('button','btn small',full?'Full':'Join');btn.type='button';
+  if(full){btn.disabled=true;}else{btn.onclick=()=>joinLive(a.id,btn);}
+  row.appendChild(btn);
  }
- act.appendChild(row);b.appendChild(act);c.appendChild(b);return c;
+ act.appendChild(row);b.appendChild(act);
+ if(appUserId&&a.creator_id===appUserId){
+  const mg=mk('div','card-actions');mg.style.marginTop='8px';
+  const ed=mk('button','btn secondary small','✎ Edit');ed.type='button';ed.onclick=()=>openEditAct(a);
+  const dl=mk('button','btn danger small','Delete');dl.type='button';dl.onclick=()=>deleteAct(a);
+  mg.appendChild(ed);mg.appendChild(dl);b.appendChild(mg);
+ }
+ c.appendChild(b);return c;
 }
 function renderLive(){
- ['liveGrid','liveGridX'].forEach(id=>{const g=$(id);g.innerHTML='';live.forEach(a=>g.appendChild(liveCard(a)));});
+ const L=[...live].sort((a,b)=>(boosted.has(b.id)?1:0)-(boosted.has(a.id)?1:0));
+ ['liveGrid','liveGridX'].forEach(id=>{const g=$(id);g.innerHTML='';L.forEach(a=>g.appendChild(liveCard(a)));});
  $('liveMsg').textContent=live.length?'':'No live activities yet. Be the first to create one!';
 }
 function renderMine(){
@@ -864,16 +1071,18 @@ async function loadLive(){
    if(m.error)console.warn('Members not loaded:',m.error.message);
    else(m.data||[]).forEach(r=>{counts[r.activity_id]=(counts[r.activity_id]||0)+1;if(r.user_id===appUserId)joined.add(r.activity_id);});
   }
-  renderLive();
+  await loadFeatured();renderLive();renderFeatured();
   if(appUserId)loadMine();
  }catch(e){console.warn('Activities not loaded:',e.message||e);$('liveMsg').textContent='Could not load activities right now.';}
 }
 async function joinLive(id,btn){
  if(!sb||!appUserId){needLogin('join activities');return;}
+ const act=live.find(x=>x.id===id);
+ if(!joined.has(id)&&act&&act.max_members&&(counts[id]||0)>=act.max_members){toast('This activity is full.');return;}
  btn.disabled=true;
  const r=joined.has(id)?await sb.from('activity_members').delete().eq('activity_id',id).eq('user_id',appUserId):await sb.from('activity_members').insert({activity_id:id,user_id:appUserId});
  btn.disabled=false;
- if(r.error&&r.error.code!=='23505'){toast('Could not update: '+r.error.message);return;}
+ if(r.error&&r.error.code!=='23505'){toast(r.error.code==='42501'?'This activity is full or not available.':'Could not update: '+r.error.message);return;}
  loadLive();
 }
 renderChats();
