@@ -204,6 +204,15 @@ body.guest .backwel{display:none}
 .num{flex:none;width:30px;height:30px;border-radius:50%;background:linear-gradient(140deg,#a239ff,#651dff);display:grid;place-items:center;font-weight:800;font-size:14px}
 @media(min-width:900px){.fgrid{grid-template-columns:repeat(4,1fr)}.fgrid.f3{grid-template-columns:repeat(3,1fr)}.steps{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:520px){.bhero{padding:22px}.bhero h1{font-size:25px}.fgrid.f3{grid-template-columns:1fr}}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.pchip{padding:9px 14px;border-radius:30px;background:var(--panel);border:1px solid var(--border);color:#ddd5ed;font-size:13px}
+.pchip.on{background:#7629e8;border-color:#a65aff;color:#fff}
+.pricebox{background:#0e0b1b;border:1px solid var(--border);border-radius:12px;padding:12px;margin:10px 0;font-size:14px;line-height:1.5}
+.pricebox strong{font-size:20px}
+.prefbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0;padding:10px 14px;background:var(--panel);border:1px solid var(--border);border-radius:14px;font-size:13px;color:#d8d0e7}
+.card.top{border-color:#e0a82e;box-shadow:0 0 0 1px #e0a82e55,0 6px 24px #e0a82e22}
+.card.boost{border-color:#a65aff}
+.card.big{border-color:#7a46d6}
 </style>
 </head>
 <body>
@@ -314,6 +323,7 @@ body.guest .backwel{display:none}
   <p>Discover events, meet people, explore places and be part of something exciting.</p>
   <div><button class="btn" onclick="showPage('explore')">Explore Now →</button></div>
  </div>
+ <div class="prefbar"><span id="prefText"></span><button class="btn secondary small" type="button" onclick="openPrefs()">Set area &amp; interests</button></div>
  <div id="featWrap" style="display:none"><div class="section-head"><h2>⭐ Featured</h2></div><div class="grid" id="featGrid"></div></div>
  <div class="section-head"><h2>Live Activities</h2><button class="btn secondary small" type="button" onclick="loadLive()">Refresh</button></div>
  <p class="note" id="liveMsg">Loading activities…</p>
@@ -468,17 +478,14 @@ body.guest .backwel{display:none}
  </div>
  <h2>How it works</h2>
  <div class="steps">
-  <div class="step"><span class="num">1</span><div><strong>Register your business</strong><p>Add your name, category and address. The SCENE team reviews it.</p></div></div>
-  <div class="step"><span class="num">2</span><div><strong>Choose a promotion</strong><p>Request a Featured Listing, or boost one of your activities.</p></div></div>
-  <div class="step"><span class="num">3</span><div><strong>Go live</strong><p>We confirm the price and dates with you, then you appear on SCENE.</p></div></div>
+  <div class="step"><span class="num">1</span><div><strong>Register your business</strong><p>Add your name, category and address. It stays private until you promote it.</p></div></div>
+  <div class="step"><span class="num">2</span><div><strong>Choose a promotion</strong><p>Pick a tier and the number of days. You see the exact price first.</p></div></div>
+  <div class="step"><span class="num">3</span><div><strong>Pay and go live</strong><p>Your promotion starts automatically once payment is confirmed. No waiting for approval.</p></div></div>
  </div>
- <h2>Plans</h2>
- <div class="fgrid f3">
-  <div class="fitem"><div class="ficon">⭐</div><h3>Featured Listing</h3><p>Your business shown on Home.</p><strong>From Rs. 500</strong></div>
-  <div class="fitem"><div class="ficon">🚀</div><h3>Activity Boost</h3><p>Your activity shown first.</p><strong>From Rs. 100</strong></div>
-  <div class="fitem"><div class="ficon">🏪</div><h3>Business Profile</h3><p>A full page for your business.</p><strong>Plans coming soon</strong></div>
- </div>
- <p class="meta">Prices are proposed demo prices, not active offers. Nothing is charged in the app. Payment is confirmed directly with the SCENE team.</p>
+ <h2>Pricing (per day)</h2>
+ <div class="fgrid f3" id="ratesGrid"></div>
+ <p class="note" id="payNote" style="display:none">Online payment is being set up. You can already create a request; it goes live once payment is connected and completed.</p>
+ <p class="meta">The total is calculated automatically from the number of days. Nothing is charged until you pay.</p>
  <h2>Your Business</h2>
  <div id="bizBox"></div>
 </section>
@@ -514,24 +521,37 @@ body.guest .backwel{display:none}
 <div id="bizModal" class="modal" style="display:none">
  <form class="form" id="bizForm" novalidate>
   <h2 style="margin:0 0 4px">Register your business</h2>
-  <p style="margin:0 0 6px;font-size:13px">New businesses are reviewed by the SCENE team before they appear publicly.</p>
+  <p style="margin:0 0 6px;font-size:13px">Your business becomes visible to everyone as soon as you run a paid promotion.</p>
   <div class="field"><label for="bzName">Business name</label><input id="bzName" maxlength="80"></div>
   <div class="field"><label for="bzCat">Category</label><select id="bzCat"><option>Cafe</option><option>Restaurant</option><option>Shop</option><option>Sports &amp; Fitness</option><option>Events</option><option>Other</option></select></div>
   <div class="field"><label for="bzDesc">Description</label><textarea id="bzDesc" maxlength="400" placeholder="What does your business offer?"></textarea></div>
   <div class="field"><label for="bzAddr">Address</label><input id="bzAddr" maxlength="150" placeholder="e.g. F-8 Markaz, Islamabad"></div>
   <div class="msg" id="bzMsg" role="alert"></div>
-  <div class="row2"><button class="btn" type="submit" id="bzSave">Submit for review</button><button class="btn secondary" type="button" onclick="$('bizModal').style.display='none'">Cancel</button></div>
+  <div class="row2"><button class="btn" type="submit" id="bzSave">Save business</button><button class="btn secondary" type="button" onclick="$('bizModal').style.display='none'">Cancel</button></div>
  </form>
 </div>
 <div id="promoModal" class="modal" style="display:none">
  <form class="form" id="promoForm" novalidate>
-  <h2 style="margin:0 0 4px">Request a promotion</h2>
-  <p style="margin:0 0 6px;font-size:13px">Nothing is charged here. The SCENE team reviews your request and confirms the price and dates with you.</p>
-  <div class="field"><label for="prType">What do you want to promote?</label><select id="prType"><option value="featured_listing">Featured Listing (a business)</option><option value="activity_boost">Activity Boost (one of my activities)</option></select></div>
+  <h2 style="margin:0 0 4px">Promote on SCENE</h2>
+  <p style="margin:0 0 6px;font-size:13px">Choose a promotion and the number of days. The price is calculated automatically.</p>
+  <div class="field"><label for="prType">Promotion</label><select id="prType"></select></div>
+  <div class="field" id="prWhatF" style="display:none"><label for="prWhat">Promote</label><select id="prWhat"><option value="business">A business</option><option value="activity">One of my activities</option></select></div>
   <div class="field" id="prBizF"><label for="prBiz">Business</label><select id="prBiz"></select></div>
   <div class="field" id="prActF" style="display:none"><label for="prAct">Activity</label><select id="prAct"></select></div>
+  <div class="field"><label for="prDays">Number of days</label><input type="number" id="prDays" min="1" max="30" value="3" inputmode="numeric"><div class="chips" id="prChips" style="margin-top:8px"></div></div>
+  <div class="pricebox" id="prPrice"></div>
   <div class="msg" id="prMsg" role="alert"></div>
-  <div class="row2"><button class="btn" type="submit" id="prSave">Send request</button><button class="btn secondary" type="button" onclick="$('promoModal').style.display='none'">Cancel</button></div>
+  <div class="row2"><button class="btn" type="submit" id="prSave">Continue to payment</button><button class="btn secondary" type="button" onclick="$('promoModal').style.display='none'">Cancel</button></div>
+ </form>
+</div>
+<div id="prefModal" class="modal" style="display:none">
+ <form class="form" id="prefForm" novalidate>
+  <h2 style="margin:0 0 4px">Your area and interests</h2>
+  <p style="margin:0 0 6px;font-size:13px">We show the nearest activities that match your interests first.</p>
+  <div class="field"><label for="pfArea">Your area (sector)</label><select id="pfArea"></select></div>
+  <div class="field"><label>Interests</label><div class="chips" id="pfInt"></div></div>
+  <div class="field"><label>Sports you like</label><div class="chips" id="pfSub"></div></div>
+  <div class="row2"><button class="btn" type="submit">Save</button><button class="btn secondary" type="button" onclick="$('prefModal').style.display='none'">Cancel</button></div>
  </form>
 </div>
 <div class="toast" id="toast" role="status"></div>
@@ -556,7 +576,7 @@ function browseAsGuest(){document.body.classList.add('authed','guest');showPage(
 function needLogin(reason){showAuth('signin');msg('siMsg','Please sign in to '+reason+'.','');}
 let recovering=/type=recovery/.test(location.hash);
 let appUserId=null;
-let boosted=new Set(),featBiz=[],myBiz=[],myPromos=[],chatSig='',chatForce=false,myProfile={},live=[],counts={},joined=new Set(),mine=[],names={},chatActivity=null,chatTimer=null;
+let promoTier=new Map(),rates=null,payTest=false,prefs={area:'',interests:[],subs:[]},boosted=new Set(),featBiz=[],myBiz=[],myPromos=[],chatSig='',chatForce=false,myProfile={},live=[],counts={},joined=new Set(),mine=[],names={},chatActivity=null,chatTimer=null;
 
 function showAuth(name){
  document.body.classList.remove('authed');
@@ -918,14 +938,20 @@ async function deleteAct(a){
 }
 
 /* ============ BUSINESS AND PROMOTIONS ============ */
-const PROMO_LABEL={featured_listing:'Featured Listing',activity_boost:'Activity Boost',business_profile:'Business Profile'};
+const PAYMENTS_LIVE=false; // set to true after the payment gateway (create-checkout function) is connected
+const PROMO_LABEL={featured_listing:'Featured Listing',activity_boost:'Activity Boost',top_spot:'Top Spot',business_profile:'Business Profile'};
+const DEFAULT_RATES=[{tier:'activity_boost',label:'Activity Boost',price_per_day:100,min_days:1,max_days:30},{tier:'featured_listing',label:'Featured Listing',price_per_day:500,min_days:1,max_days:30},{tier:'top_spot',label:'Top Spot',price_per_day:1500,min_days:1,max_days:14}];
+const TIER_INFO={activity_boost:['🚀','Your activity is shown above normal ones.'],featured_listing:['⭐','Your business appears in Featured on Home.'],top_spot:['👑','Shown above everything else, highlighted in gold.']};
+const fmtRs=n=>'Rs. '+Number(n).toLocaleString('en-US');
+const rateOf=t=>(rates||DEFAULT_RATES).find(r=>r.tier===t);
 function badge(text,kind){return mk('span','badge '+(kind||''),text);}
-function promoBadge(st){const m={active:['Active','ok'],pending:['Pending review','wait'],rejected:['Rejected','bad'],cancelled:['Cancelled',''],expired:['Expired','']};const x=m[st]||[st||'Pending review','wait'];return badge(x[0],x[1]);}
+function promoBadge(st){const m={active:['Live','ok'],awaiting_payment:['Awaiting payment','wait'],pending:['Pending','wait'],rejected:['Rejected','bad'],cancelled:['Cancelled',''],expired:['Expired','']};const x=m[st]||[st||'Pending review','wait'];return badge(x[0],x[1]);}
 function renderFeatured(){
  const g=$('featGrid');g.innerHTML='';
  featBiz.forEach(b=>{
-  const c=mk('article','card');c.appendChild(mk('div','cover cafe','🏪'));
-  const bd=mk('div','card-body');bd.appendChild(mk('div','tag','⭐ Featured · '+(b.category||'Business')));
+  const top=b._tier==='top_spot';
+  const c=mk('article','card'+(top?' top':' boost'));c.appendChild(mk('div','cover cafe','🏪'));
+  const bd=mk('div','card-body');bd.appendChild(mk('div','tag',(top?'👑 Top Spot':'⭐ Featured')+' · '+(b.category||'Business')));
   bd.appendChild(mk('h3','',b.name||'Business'));
   if(b.address)bd.appendChild(mk('div','meta','📍 '+b.address));
   if(b.description)bd.appendChild(mk('div','meta',b.description.length>90?b.description.slice(0,90)+'…':b.description));
@@ -940,34 +966,61 @@ async function loadFeatured(){
   if(pr.error)throw pr.error;
   const now=Date.now();
   const act=(pr.data||[]).filter(x=>(!x.starts_at||new Date(x.starts_at)<=now)&&(!x.ends_at||new Date(x.ends_at)>=now));
-  boosted=new Set(act.filter(x=>x.activity_id).map(x=>x.activity_id));
-  const ids=[...new Set(act.filter(x=>x.business_id).map(x=>x.business_id))];
+  promoTier=new Map();const bizTier=new Map();
+  act.forEach(x=>{
+   if(x.activity_id&&promoTier.get(x.activity_id)!=='top_spot')promoTier.set(x.activity_id,x.promotion_type);
+   if(x.business_id&&bizTier.get(x.business_id)!=='top_spot')bizTier.set(x.business_id,x.promotion_type);
+  });
+  boosted=new Set(promoTier.keys());
   featBiz=[];
-  if(ids.length){const b=await sb.from('businesses').select('*').in('id',ids);if(!b.error)featBiz=(b.data||[]).filter(x=>x.is_approved!==false);}
- }catch(e){console.warn('Featured not loaded:',e.message||e);boosted=new Set();featBiz=[];}
+  const ids=[...bizTier.keys()];
+  if(ids.length){const b=await sb.from('businesses').select('*').in('id',ids);if(!b.error)featBiz=(b.data||[]).map(x=>Object.assign({_tier:bizTier.get(x.id)},x)).sort((a,b)=>(b._tier==='top_spot'?1:0)-(a._tier==='top_spot'?1:0));}
+ }catch(e){console.warn('Featured not loaded:',e.message||e);boosted=new Set();promoTier=new Map();featBiz=[];}
 }
+function renderRates(){
+ const g=$('ratesGrid');if(!g)return;g.innerHTML='';
+ (rates||DEFAULT_RATES).forEach(r=>{
+  const info=TIER_INFO[r.tier]||['✨',''];
+  const c=mk('div','fitem');c.appendChild(mk('div','ficon',info[0]));c.appendChild(mk('h3','',r.label));c.appendChild(mk('p','',info[1]));
+  c.appendChild(mk('strong','',fmtRs(r.price_per_day)+' / day'));
+  c.appendChild(mk('div','meta',r.min_days+'–'+r.max_days+' days'));g.appendChild(c);
+ });
+ $('payNote').style.display=(PAYMENTS_LIVE||payTest)?'none':'';
+}
+function bizLive(id){return myPromos.some(p=>p.business_id===id&&p.status==='active'&&(!p.ends_at||new Date(p.ends_at)>=Date.now()));}
 function renderBiz(){
  const box=$('bizBox');box.innerHTML='';
  if(!appUserId){
-  box.appendChild(mk('p','','Sign in to register your business and request promotions.'));
+  box.appendChild(mk('p','','Sign in to register your business and promote it.'));
   const b=mk('button','btn small','Sign in');b.type='button';b.onclick=()=>needLogin('register your business');box.appendChild(b);return;
  }
  myBiz.forEach(x=>{
   const r=mk('div','bizrow');const l=mk('div','');
   l.appendChild(mk('strong','',x.name));l.appendChild(mk('div','meta',[x.category,x.address].filter(Boolean).join(' · ')));
-  r.appendChild(l);r.appendChild(x.is_approved===false?badge('Pending approval','wait'):badge('Approved','ok'));box.appendChild(r);
+  r.appendChild(l);r.appendChild(bizLive(x.id)?badge('Live','ok'):badge('Not promoted yet',''));box.appendChild(r);
  });
  const row=mk('div','');row.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin:10px 0';
- const add=mk('button','btn small','＋ Register a business');add.type='button';add.onclick=openBiz;row.appendChild(add);
- const rq=mk('button','btn secondary small','Request a promotion');rq.type='button';rq.onclick=openPromo;row.appendChild(rq);
+ const add=mk('button','btn secondary small','＋ Register a business');add.type='button';add.onclick=openBiz;row.appendChild(add);
+ const rq=mk('button','btn small','Promote now');rq.type='button';rq.onclick=openPromo;row.appendChild(rq);
  box.appendChild(row);
  if(myPromos.length){
-  box.appendChild(mk('h3','','Your promotion requests'));
+  box.appendChild(mk('h3','','Your promotions'));
   myPromos.forEach(x=>{
    const biz=myBiz.find(b=>b.id===x.business_id),ac=[...mine,...live].find(a=>a.id===x.activity_id);
    const r=mk('div','bizrow');const l=mk('div','');
    l.appendChild(mk('strong','',PROMO_LABEL[x.promotion_type]||x.promotion_type));
-   l.appendChild(mk('div','meta',(biz?biz.name:ac?ac.title:'')||''));r.appendChild(l);r.appendChild(promoBadge(x.status));box.appendChild(r);
+   let m=(biz?biz.name:ac?ac.title:'')||'';
+   if(x.days)m+=(m?' · ':'')+x.days+' day'+(x.days===1?'':'s');
+   if(x.amount!=null)m+=' · '+fmtRs(x.amount);
+   if(x.status==='active'&&x.ends_at)m+=' · until '+new Date(x.ends_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+   l.appendChild(mk('div','meta',m));r.appendChild(l);
+   const rt=mk('div','');rt.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:wrap';
+   rt.appendChild(promoBadge(x.status));
+   if(x.status==='awaiting_payment'){
+    const pay=mk('button','btn small','Pay '+fmtRs(x.amount));pay.type='button';pay.onclick=()=>payPromotion(x);rt.appendChild(pay);
+    const cn=mk('button','btn secondary small','Cancel');cn.type='button';cn.onclick=()=>cancelPromo(x);rt.appendChild(cn);
+   }
+   r.appendChild(rt);box.appendChild(r);
   });
  }
 }
@@ -1000,43 +1053,148 @@ $('bizForm').addEventListener('submit',async e=>{
  const r=await sb.from('businesses').insert(row);
  busy('bzSave',false);
  if(r.error)return msg('bzMsg','Could not submit: '+r.error.message,'err');
- $('bizModal').style.display='none';toast('Submitted. We will review your business soon.');loadBiz();
+ $('bizModal').style.display='none';toast('Business saved. Promote it to make it visible to everyone.');loadBiz();
 });
-function openPromo(){
- const bs=myBiz.filter(b=>b.is_approved!==false),as=mine.filter(a=>a.creator_id===appUserId);
- const fill=(sel,items,lab)=>{sel.innerHTML='';items.forEach(x=>{const o=document.createElement('option');o.value=x.id;o.textContent=lab(x);sel.appendChild(o);});};
- fill($('prBiz'),bs,b=>b.name);fill($('prAct'),as,a=>a.title);
- const hasB=bs.length>0,hasA=as.length>0;
- const oF=$('prType').querySelector('option[value=featured_listing]'),oA=$('prType').querySelector('option[value=activity_boost]');
- oF.disabled=!hasB;oA.disabled=!hasA;
- oF.textContent='Featured Listing (a business)'+(hasB?'':' - not available yet');
- oA.textContent='Activity Boost (one of my activities)'+(hasA?'':' - not available yet');
- $('prType').value=hasB?'featured_listing':'activity_boost';togglePromoType();
- $('prSave').disabled=!hasB&&!hasA;
- let note='';
- if(!hasB&&!hasA)note=myBiz.length?'Your business is still waiting for approval, and you have no activity of your own yet. Create an activity or wait for approval.':'To request a promotion you need an approved business or an activity you created. Register a business first, or create an activity.';
- else if(!hasB)note=myBiz.length?'Your business is still waiting for approval. Only Activity Boost is available for now.':'Register a business to request a Featured Listing. Only Activity Boost is available for now.';
- else if(!hasA)note='Only Featured Listing is available. Create an activity to boost it.';
- msg('prMsg',note,'');
- $('promoModal').style.display='flex';
+function ownActs(){return mine.filter(a=>a.creator_id===appUserId);}
+function fillSel(sel,items,lab){sel.innerHTML='';items.forEach(x=>{const o=document.createElement('option');o.value=x.id;o.textContent=lab(x);sel.appendChild(o);});}
+function promoWhat(){
+ const t=$('prType').value,hasB=myBiz.length>0,hasA=ownActs().length>0;
+ if(t==='featured_listing')return 'business';
+ if(t==='activity_boost')return 'activity';
+ if(!hasB)return 'activity';if(!hasA)return 'business';
+ return $('prWhat').value;
 }
-function togglePromoType(){const f=$('prType').value==='featured_listing';$('prBizF').style.display=f?'':'none';$('prActF').style.display=f?'none':'';}
-$('prType').addEventListener('change',togglePromoType);
+function openPromo(){
+ if(!appUserId){needLogin('promote on SCENE');return;}
+ const hasB=myBiz.length>0,as=ownActs(),hasA=as.length>0;
+ fillSel($('prBiz'),myBiz,b=>b.name);fillSel($('prAct'),as,a=>a.title);
+ const sel=$('prType');sel.innerHTML='';
+ (rates||DEFAULT_RATES).forEach(r=>{
+  const ok=r.tier==='featured_listing'?hasB:r.tier==='activity_boost'?hasA:(hasB||hasA);
+  const o=document.createElement('option');o.value=r.tier;o.disabled=!ok;
+  o.textContent=r.label+' - '+fmtRs(r.price_per_day)+'/day'+(ok?'':' (not available yet)');sel.appendChild(o);
+ });
+ const first=[...sel.options].find(o=>!o.disabled);
+ if(first)sel.value=first.value;
+ $('prSave').disabled=!first;
+ msg('prMsg',first?'':'Register a business or create an activity first, then come back to promote it.','');
+ syncPromo();$('promoModal').style.display='flex';
+}
+function syncPromo(){
+ const t=$('prType').value,r=rateOf(t);
+ const both=myBiz.length>0&&ownActs().length>0;
+ $('prWhatF').style.display=(t==='top_spot'&&both)?'':'none';
+ const w=promoWhat();
+ $('prBizF').style.display=w==='business'?'':'none';$('prActF').style.display=w==='activity'?'':'none';
+ const ch=$('prChips');ch.innerHTML='';
+ if(!r){$('prPrice').textContent='';return;}
+ const d=$('prDays');d.min=r.min_days;d.max=r.max_days;
+ [1,3,7,14,30].filter(n=>n>=r.min_days&&n<=r.max_days).forEach(n=>{
+  const b=mk('button','pchip'+(parseInt(d.value,10)===n?' on':''),n+' day'+(n===1?'':'s'));b.type='button';b.onclick=()=>{d.value=n;syncPromo();};ch.appendChild(b);
+ });
+ const n=parseInt(d.value,10);
+ if(!(n>=r.min_days&&n<=r.max_days)){$('prPrice').textContent='Enter between '+r.min_days+' and '+r.max_days+' days.';return;}
+ $('prPrice').innerHTML='';
+ $('prPrice').appendChild(document.createTextNode('Total'));$('prPrice').appendChild(document.createElement('br'));
+ $('prPrice').appendChild(mk('strong','',fmtRs(r.price_per_day*n)));
+ $('prPrice').appendChild(document.createTextNode(' for '+n+' day'+(n===1?'':'s')+' ('+fmtRs(r.price_per_day)+' / day). It starts right after payment.'));
+}
+['prType','prWhat'].forEach(id=>$(id).addEventListener('change',syncPromo));
+$('prDays').addEventListener('input',syncPromo);
+async function payPromotion(p){
+ if(!sb||!appUserId)return;
+ if(payTest){
+  const r=await sb.rpc('simulate_payment',{p_id:p.id});
+  if(r.error){toast('Payment failed: '+r.error.message);return;}
+  toast('Test payment done. Your promotion is live.');await loadBiz();loadLive();return;
+ }
+ try{const r=await sb.functions.invoke('create-checkout',{body:{promotion_id:p.id}});if(r.data&&r.data.url){location.href=r.data.url;return;}}catch(e){}
+ toast('Saved. Online payment is not connected yet.');
+}
+async function cancelPromo(p){
+ if(!confirm('Cancel this unpaid request?'))return;
+ const r=await sb.from('promotions').update({status:'cancelled'}).eq('id',p.id).select('id');
+ if(r.error||!r.data||!r.data.length){toast('Could not cancel.');return;}
+ loadBiz();
+}
 $('promoForm').addEventListener('submit',async e=>{
  e.preventDefault();
- if(!sb||!appUserId){needLogin('request a promotion');return;}
- const f=$('prType').value==='featured_listing';
- const target=f?$('prBiz').value:$('prAct').value;
- if(!target)return msg('prMsg',f?'You need an approved business first.':'You need an activity of your own first.','err');
- busy('prSave',true,'Sending…');msg('prMsg','');
- const row={id:crypto.randomUUID(),owner_id:appUserId,promotion_type:$('prType').value,status:'pending'};
- if(f)row.business_id=target;else row.activity_id=target;
- const r=await sb.from('promotions').insert(row);
+ if(!sb||!appUserId){needLogin('promote on SCENE');return;}
+ const t=$('prType').value,r=rateOf(t),n=parseInt($('prDays').value,10),w=promoWhat();
+ if(!r||!(n>=r.min_days&&n<=r.max_days))return msg('prMsg','Enter between '+(r?r.min_days:1)+' and '+(r?r.max_days:30)+' days.','err');
+ const target=w==='business'?$('prBiz').value:$('prAct').value;
+ if(!target)return msg('prMsg',w==='business'?'Register a business first.':'Create an activity first.','err');
+ busy('prSave',true,'Please wait…');msg('prMsg','');
+ const row={id:crypto.randomUUID(),owner_id:appUserId,promotion_type:t,days:n,status:'awaiting_payment'};
+ if(w==='business')row.business_id=target;else row.activity_id=target;
+ const ins=await sb.from('promotions').insert(row);
  busy('prSave',false);
- if(r.error)return msg('prMsg','Could not send: '+r.error.message,'err');
- $('promoModal').style.display='none';toast('Request sent. We will contact you to confirm.');loadBiz();
+ if(ins.error)return msg('prMsg','Could not create: '+ins.error.message,'err');
+ $('promoModal').style.display='none';
+ row.amount=r.price_per_day*n;
+ await loadBiz();payPromotion(row);
 });
-renderBiz();
+async function loadRates(){
+ rates=DEFAULT_RATES;
+ if(sb){
+  try{const r=await sb.from('promotion_rates').select('*');if(!r.error&&r.data&&r.data.length)rates=r.data.map(x=>Object.assign({},x,{price_per_day:Number(x.price_per_day)})).sort((a,b)=>a.price_per_day-b.price_per_day);}catch(e){}
+  try{const q=await sb.from('app_settings').select('value').eq('key','payment_test_mode').maybeSingle();payTest=!!(q.data&&q.data.value==='on');}catch(e){}
+ }
+ renderRates();
+}
+renderBiz();renderRates();loadRates();
+
+/* ============ SMART FEED: area, interests, promotions ============ */
+const INTERESTS=['Sports','Hangout','Event','Study Group','Gaming'],SUBS=['Cricket','Football','Badminton','Volleyball'];
+const BIG_JOINED=20;
+const SECTORS=['Blue Area'];
+[['E',[7,8,9,10,11]],['F',[5,6,7,8,9,10,11]],['G',[5,6,7,8,9,10,11,12,13]],['H',[8,9,10,11,12,13]],['I',[8,9,10,11,12,13,14,15,16]]].forEach(x=>x[1].forEach(n=>SECTORS.push(x[0]+'-'+n)));
+function loadPrefs(){try{const p=JSON.parse(localStorage.getItem('scene_prefs')||'{}');prefs={area:p.area||'',interests:p.interests||[],subs:p.subs||[]};}catch(e){}}
+function savePrefs(){try{localStorage.setItem('scene_prefs',JSON.stringify(prefs));}catch(e){}}
+function sectorXY(t){
+ t=t||'';
+ if(/blue\s*area/i.test(t))return {r:6,c:6.5};
+ const m=/\b([A-I])\s*-?\s*(\d{1,2})\b/i.exec(t);
+ return m?{r:m[1].toUpperCase().charCodeAt(0)-65,c:parseInt(m[2],10)}:null;
+}
+function distKm(a,b){if(!a||!b)return null;const dr=(a.r-b.r)*2.0,dc=(a.c-b.c)*1.9;return Math.sqrt(dr*dr+dc*dc);}
+function distTo(a){return prefs.area?distKm(sectorXY(prefs.area),sectorXY(a.location)):null;}
+function whenTs(a){return a.activity_date?new Date(a.activity_date+'T'+(a.activity_time||'00:00')).getTime():null;}
+function isBig(a){return (counts[a.id]||0)>=BIG_JOINED||(a.max_members||0)>=100;}
+function myCats(){return new Set(mine.map(a=>(a.category||'').toLowerCase()));}
+function scoreAct(a){
+ let s=0;const t=promoTier.get(a.id);
+ if(t==='top_spot')s+=1000;else if(t)s+=700;
+ if(isBig(a))s+=300;
+ const cat=(a.category||'').toLowerCase();
+ if(prefs.interests.some(i=>i.toLowerCase()===cat))s+=80;else if(myCats().has(cat))s+=30;
+ const text=((a.title||'')+' '+(a.description||'')).toLowerCase();
+ if(prefs.subs.some(x=>text.includes(x.toLowerCase())))s+=50;
+ const d=distTo(a);if(d!=null)s+=Math.max(0,100-d*14);
+ const ts=whenTs(a);if(ts!=null){const h=(ts-Date.now())/36e5;if(h<-3)s-=600;else if(h<48)s+=30;else if(h<168)s+=10;}
+ return s;
+}
+function distLabel(a){const d=distTo(a);if(d==null)return '';return d<0.5?' · Same sector':' · ≈ '+Math.max(1,Math.round(d))+' km';}
+function renderPrefBar(){
+ const bits=[];if(prefs.area)bits.push('📍 '+prefs.area);
+ if(prefs.interests.length||prefs.subs.length)bits.push([...prefs.interests,...prefs.subs].join(', '));
+ $('prefText').textContent=bits.length?bits.join(' · '):'Showing activities across Islamabad';
+}
+function openPrefs(){
+ const a=$('pfArea');a.innerHTML='<option value="">Not set</option>'+SECTORS.map(x=>'<option>'+x+'</option>').join('');a.value=prefs.area||'';
+ const build=(id,list,key)=>{const box=$(id);box.innerHTML='';list.forEach(x=>{const b=mk('button','pchip'+(prefs[key].includes(x)?' on':''),x);b.type='button';b.dataset.v=x;b.onclick=()=>b.classList.toggle('on');box.appendChild(b);});};
+ build('pfInt',INTERESTS,'interests');build('pfSub',SUBS,'subs');
+ $('prefModal').style.display='flex';
+}
+$('prefModal').addEventListener('click',e=>{if(e.target===$('prefModal'))$('prefModal').style.display='none';});
+$('prefForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ prefs.area=$('pfArea').value;
+ prefs.interests=[...$('pfInt').querySelectorAll('.on')].map(b=>b.dataset.v);
+ prefs.subs=[...$('pfSub').querySelectorAll('.on')].map(b=>b.dataset.v);
+ savePrefs();renderPrefBar();renderLive();$('prefModal').style.display='none';toast('Feed updated');
+});
+loadPrefs();renderPrefBar();
 
 /* ============ LIVE DATA (Supabase) ============ */
 function mk(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
@@ -1048,13 +1206,14 @@ function when(a){
 }
 function liveCard(a){
  const cat=a.category||'Activity';
- const c=mk('article','card activity');
+ const tier=promoTier.get(a.id),big=isBig(a),ts0=whenTs(a),ended=ts0!=null&&ts0<Date.now()-3*36e5;
+ const c=mk('article','card activity'+(tier==='top_spot'?' top':tier?' boost':big?' big':''));
  c.dataset.search=((a.title||'')+' '+cat+' '+(a.location||'')).toLowerCase();
  c.appendChild(mk('div','cover',ICON[cat.toLowerCase()]||'✨'));
  const b=mk('div','card-body');
- b.appendChild(mk('div','tag',(boosted.has(a.id)?'⭐ Featured · ':'')+cat));
+ b.appendChild(mk('div','tag',(tier==='top_spot'?'👑 Top Spot · ':tier?'⭐ Featured · ':big?'🔥 Big event · ':'')+(ended?'Ended · ':'')+cat));
  b.appendChild(mk('h3','',a.title||'Untitled'));
- b.appendChild(mk('div','meta','📍 '+(a.location||'Islamabad')));
+ b.appendChild(mk('div','meta','📍 '+(a.location||'Islamabad')+distLabel(a)));
  const w=when(a);if(w)b.appendChild(mk('div','meta','🗓 '+w));
  const act=mk('div','card-actions');
  act.appendChild(mk('span','count',appUserId?(counts[a.id]||0)+(a.max_members?'/'+a.max_members:'')+' joined'+(joined.has(a.id)?' · You ✓':'')+(a.is_public===false?' · Private':''):'Open to join'));
@@ -1079,7 +1238,7 @@ function liveCard(a){
  c.appendChild(b);return c;
 }
 function renderLive(){
- const L=[...live].sort((a,b)=>(boosted.has(b.id)?1:0)-(boosted.has(a.id)?1:0));
+ const L=[...live].sort((a,b)=>scoreAct(b)-scoreAct(a));
  ['liveGrid','liveGridX'].forEach(id=>{const g=$(id);g.innerHTML='';L.forEach(a=>g.appendChild(liveCard(a)));});
  $('liveMsg').textContent=live.length?'':'No live activities yet. Be the first to create one!';
 }
@@ -1117,7 +1276,8 @@ async function loadMine(){
 async function loadLive(){
  if(!sb){$('liveMsg').textContent='Live activities are unavailable until Supabase is connected.';return;}
  try{
-  let q=sb.from('activities').select('*').order('created_at',{ascending:false}).limit(40);
+  const y=new Date();y.setDate(y.getDate()-1);const ymd=y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0');
+  let q=sb.from('activities').select('*').gte('activity_date',ymd).order('activity_date',{ascending:true}).limit(60);
   q=appUserId?q.or('is_public.eq.true,creator_id.eq.'+appUserId):q.eq('is_public',true);
   const a=await q;if(a.error)throw a.error;
   live=a.data||[];counts={};joined=new Set();
@@ -1127,7 +1287,10 @@ async function loadLive(){
    if(m.error)console.warn('Members not loaded:',m.error.message);
    else(m.data||[]).forEach(r=>{counts[r.activity_id]=(counts[r.activity_id]||0)+1;if(r.user_id===appUserId)joined.add(r.activity_id);});
   }
-  await loadFeatured();renderLive();renderFeatured();
+  await loadFeatured();
+  const miss=[...boosted].filter(id=>!live.some(a=>a.id===id));
+  if(miss.length){const x=await sb.from('activities').select('*').in('id',miss);if(!x.error)live=live.concat((x.data||[]).filter(a=>a.is_public!==false||a.creator_id===appUserId));}
+  renderLive();renderFeatured();
   if(appUserId)loadMine();
  }catch(e){console.warn('Activities not loaded:',e.message||e);$('liveMsg').textContent='Could not load activities right now.';}
 }
