@@ -274,6 +274,30 @@ body.guest .backwel{display:none}
 .sheet{width:100%;max-width:420px;margin:auto;background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:8px}
 .sheet button{display:block;width:100%;text-align:left;background:none;border:0;color:#fff;padding:15px 16px;font-size:15px;border-radius:12px}
 .sheet button:active{background:#241c3d}
+.locbtn{background:none;border:0;color:var(--muted);font-size:13px;padding:6px 4px}
+.bellbtn{position:relative;background:none;border:0;font-size:22px;padding:4px 6px;line-height:1}
+.bdot{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;border-radius:9px;background:#ff4d6d;color:#fff;font-size:10px;font-weight:800;place-items:center;padding:0 4px}
+.bnrs{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 0 10px;-webkit-overflow-scrolling:touch}
+.bnr{flex:none;width:88%;max-width:460px;min-height:200px;border-radius:22px;scroll-snap-align:start;background:linear-gradient(135deg,#2b1559,#15102d 60%,#38145e);background-size:cover;background-position:center;position:relative;border:1px solid #55318a;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;padding:18px}
+.bnr.one{width:100%;max-width:none}
+.bnr.gold{border-color:#e0a82e;box-shadow:0 0 0 1px #e0a82e55}
+.bnr h3{font-size:22px;margin:2px 0}
+.bnr .btn{align-self:flex-start;margin-top:8px}
+.people{margin:8px 0}
+.avatar.mini{border:0;margin:0;flex:none}
+#bdBox,#userBox,#coBox,#rcBox{padding:16px}
+.pm{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--border);border-radius:14px;margin:8px 0;cursor:pointer;background:#0e0b1b}
+.pm.on{border-color:#a65aff;background:#1d1438}
+.pm .rd{width:18px;height:18px;border-radius:50%;border:2px solid #6b5aa0;margin-left:auto;flex:none}
+.pm.on .rd{border-color:#a65aff;background:radial-gradient(#a65aff 45%,transparent 50%)}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px}
+.kv span:first-child{color:var(--muted)}
+.okmark{width:64px;height:64px;border-radius:50%;margin:6px auto 10px;display:grid;place-items:center;font-size:32px;background:#12301f;color:#6ee7a8}
+.flag{cursor:pointer;opacity:.75;margin-left:6px}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:#d8d0e7;margin:8px 0}
+.chk input{margin-top:2px;width:18px;height:18px;flex:none}
+.tip{background:#1b1430;border:1px solid #3a2d63;border-radius:14px;padding:12px 14px;font-size:13px;color:#d8d0e7;margin:10px 0}
+.tipl{margin:0 0 6px;padding-left:18px;font-size:13px;color:#d8d0e7;line-height:1.55}
 </style>
 </head>
 <body>
@@ -322,6 +346,7 @@ body.guest .backwel{display:none}
    <div class="field"><label for="suEmail">Email Address</label><input id="suEmail" type="email" autocomplete="email" placeholder="you@example.com"></div>
    <div class="field"><label for="suPass">Password</label><div class="pw"><input id="suPass" type="password" autocomplete="new-password" placeholder="Create a password"><button type="button" class="eye" onclick="togglePw('suPass',this)">Show</button></div><p class="hint">At least 8 characters, with a letter and a number.</p></div>
    <div class="field"><label for="suPass2">Confirm Password</label><div class="pw"><input id="suPass2" type="password" autocomplete="new-password" placeholder="Repeat your password"><button type="button" class="eye" onclick="togglePw('suPass2',this)">Show</button></div></div>
+   <label class="chk"><input type="checkbox" id="suAdult"> <span>I confirm that I am 18 years or older.</span></label>
    <div class="msg" id="suMsg" role="alert"></div>
    <button class="btn full" type="submit" id="suBtn">Create Account</button>
   </form>
@@ -366,25 +391,16 @@ body.guest .backwel{display:none}
 <div class="app">
 <header>
  <div class="brand"><div class="logo" role="img" aria-label="SCENE logo"></div> SCENE</div>
- <div class="hright"><button class="crownbtn" type="button" onclick="showPage('premium')" aria-label="Premium">👑</button><div class="location">📍 Islamabad</div></div>
+ <div class="hright"><button class="locbtn" type="button" onclick="openPrefs()" aria-label="Choose your area">📍 <span id="locText">Islamabad</span> <span class="purple">⌄</span></button><button class="bellbtn" id="bellBtn" type="button" onclick="openNotifs()" aria-label="Notifications">🔔<span class="bdot" id="bellDot" style="display:none">0</span></button></div>
  <div class="guestbtns"><button class="btn secondary small" type="button" onclick="showAuth('signin')">Sign In</button><button class="btn small" type="button" onclick="showAuth('signup')">Create Account</button></div>
 </header>
 
 <main>
 <!-- HOME -->
 <section id="home" class="page active">
- <div class="section-head">
-  <div><div class="tag">YOUR CITY. YOUR COMMUNITY.</div><h1>What's happening <span class="purple">today?</span></h1></div>
- </div>
- <input class="search" placeholder="⌕  Search activities, places or sports..." oninput="searchCards(this.value)">
- <div class="hero">
-  <div class="tag">DISCOVER YOUR CITY</div>
-  <h1>Find your next <span class="purple">SCENE.</span></h1>
-  <p>Discover events, meet people, explore places and be part of something exciting.</p>
-  <div><button class="btn" onclick="showPage('explore')">Explore Now →</button></div>
- </div>
- <div class="prefbar"><span id="prefText"></span><button class="btn secondary small" type="button" onclick="openPrefs()">Set area &amp; interests</button></div>
- <div id="featWrap" style="display:none"><div class="section-head"><h2>⭐ Featured</h2></div><div class="grid" id="featGrid"></div></div>
+ <input class="search" placeholder="⌕  Search activities, places or people..." oninput="searchCards(this.value)">
+ <div class="people" data-people></div>
+ <div class="bnrs" id="promoBanner"></div>
  <div class="categories">
    <button class="chip selected" data-type="all" onclick="filterType('all')">All</button>
    <button class="chip" data-type="sports" onclick="filterType('sports')">Sports</button>
@@ -393,16 +409,18 @@ body.guest .backwel{display:none}
    <button class="chip" data-type="study group" onclick="filterType('study group')">Study Groups</button>
    <button class="chip" data-type="gaming" onclick="filterType('gaming')">Gaming</button>
   </div>
- <div class="section-head"><h2>Live Activities</h2><button class="btn secondary small" type="button" onclick="loadLive()">Refresh</button></div>
+ <div class="section-head"><h2>Nearby Activities</h2><button class="btn secondary small" type="button" onclick="showPage('explore')">See all ›</button></div>
  <p class="note" id="liveMsg">Loading activities…</p>
  <div class="grid" id="liveGrid"></div>
+ <div id="featWrap" style="display:none"><div class="section-head"><h2>⭐ Featured Places</h2></div><div class="grid" id="featGrid"></div></div>
 </section>
 
 <!-- EXPLORE -->
 <section id="explore" class="page">
  <div class="tag">FIND YOUR SCENE</div><h1>Explore <span class="purple">your city.</span></h1>
  <p>Find activities and events happening around Islamabad.</p>
- <input class="search" placeholder="⌕  Search activities, places or sports..." oninput="searchCards(this.value)">
+ <input class="search" placeholder="⌕  Search activities, places or people..." oninput="searchCards(this.value)">
+ <div class="people" data-people></div>
  <div class="categories">
   <button class="chip selected" data-type="all" onclick="filterType('all')">All</button>
    <button class="chip" data-type="sports" onclick="filterType('sports')">Sports</button>
@@ -428,6 +446,7 @@ body.guest .backwel{display:none}
    <button class="pchip" type="button" data-v="Gaming" onclick="setType('Gaming')">Gaming</button>
   </div>
   <input type="hidden" id="activityType" value="Sports">
+  <div class="tip">🛡 <strong>Stay safe:</strong> choose a public place, never share your home address, OTP or bank details, and never ask people for money.</div>
   <div class="cfield"><label for="activityTitle">Activity Title <i>*</i></label><input id="activityTitle" maxlength="80" placeholder="e.g. Cricket Match"></div>
   <div class="cfield"><label for="activityDescription">Description</label><textarea id="activityDescription" placeholder="Tell others about your activity..."></textarea></div>
   <div class="crow">
@@ -436,7 +455,13 @@ body.guest .backwel{display:none}
   </div>
   <div class="cfield ic"><span class="ci">📍</span><div style="flex:1"><label for="activityLocation">Location</label><input id="activityLocation" maxlength="120" placeholder="e.g. F-9 Park, Islamabad"></div></div>
   <div class="cfield ic"><span class="ci">👥</span><div style="flex:1"><label for="activityMax">Max members (optional)</label><input type="number" id="activityMax" min="2" max="500" inputmode="numeric" placeholder="No limit"></div></div>
-  <div class="trow"><div><strong>Make it Public</strong><div class="meta" style="margin:2px 0 0">Let others join your activity</div></div><label class="switch"><input type="checkbox" id="activityPublic" checked><span class="slider"></span></label></div>
+  <div style="margin:14px 2px 4px;font-weight:700">Who can join?</div>
+  <input type="hidden" id="activityMode" value="open">
+  <div id="modeBox">
+   <div class="pm on" data-m="open" onclick="setMode('open')"><span>🌍</span><div><strong>Everyone</strong><div class="meta">Anyone can join instantly</div></div><span class="rd"></span></div>
+   <div class="pm" data-m="request" onclick="setMode('request')"><span>✋</span><div><strong>Request to join</strong><div class="meta">People ask, you approve each one</div></div><span class="rd"></span></div>
+   <div class="pm" data-m="friends" onclick="setMode('friends')"><span>👥</span><div><strong>Friends only</strong><div class="meta">Only people you follow who follow you back</div></div><span class="rd"></span></div>
+  </div>
   <button class="btn full" type="submit" style="padding:15px;font-size:16px">Post Activity</button>
  </form>
  <p id="createMessage"></p>
@@ -463,7 +488,7 @@ body.guest .backwel{display:none}
   <div class="avwrap"><div class="avatar big" id="profAvatar">👤</div><button class="camb" type="button" onclick="pickAvatar()" aria-label="Change photo">📷</button></div>
   <h2 id="profName" style="margin:6px 0 2px">Your Name</h2>
   <div class="purple" id="profHandle">@yourusername</div>
-  <div class="stats"><div><strong id="stCreated">0</strong><span>Created</span></div><div><strong id="stJoined">0</strong><span>Joined</span></div><div><strong id="stBiz">0</strong><span>Businesses</span></div></div>
+  <div class="stats"><div><strong id="stCreated">0</strong><span>Activities</span></div><div onclick="showFollowList('followers',appUserId)" style="cursor:pointer"><strong id="stFollowers">0</strong><span>Followers</span></div><div onclick="showFollowList('following',appUserId)" style="cursor:pointer"><strong id="stFollowing">0</strong><span>Following</span></div></div>
   <p id="profMeta" style="margin:0 0 4px;font-size:13px"></p>
   <p id="profEmail" class="meta" style="margin:0 0 12px"></p>
   <button class="btn secondary full" type="button" onclick="openEdit()">Edit Profile</button>
@@ -545,7 +570,7 @@ body.guest .backwel{display:none}
   <div class="field"><label for="eaTime">Time</label><input type="time" id="eaTime"></div>
   <div class="field"><label for="eaLoc">Location</label><input id="eaLoc" maxlength="120"></div>
   <div class="field"><label for="eaMax">Max members (optional)</label><input type="number" id="eaMax" min="2" max="500" inputmode="numeric" placeholder="Leave empty for no limit"></div>
-  <div class="field"><label for="eaPub">Who can join?</label><select id="eaPub"><option value="1">Public — Everyone can join</option><option value="0">Private — Invite only</option></select></div>
+  <div class="field"><label for="eaMode">Who can join?</label><select id="eaMode"><option value="open">Everyone</option><option value="request">Request to join</option><option value="friends">Friends only</option><option value="private">Only me (private)</option></select></div>
   <div class="msg" id="eaMsg" role="alert"></div>
   <div class="row2"><button class="btn" type="submit" id="eaSave">Save Changes</button><button class="btn secondary" type="button" onclick="closeEditAct()">Cancel</button></div>
  </form>
@@ -558,6 +583,7 @@ body.guest .backwel{display:none}
   <div class="field"><label for="bzCat">Category</label><select id="bzCat"><option>Cafe</option><option>Restaurant</option><option>Shop</option><option>Sports &amp; Fitness</option><option>Events</option><option>Other</option></select></div>
   <div class="field"><label for="bzDesc">Description</label><textarea id="bzDesc" maxlength="400" placeholder="What does your business offer?"></textarea></div>
   <div class="field"><label for="bzAddr">Address</label><input id="bzAddr" maxlength="150" placeholder="e.g. F-8 Markaz, Islamabad"></div>
+  <div class="field"><label>Photo (optional)</label><div style="display:flex;gap:10px;align-items:center"><button class="btn secondary small" type="button" id="bzPhotoBtn" onclick="pickBizPhoto()">📷 Add photo</button><span id="bzPhotoName" class="meta"></span></div></div>
   <div class="msg" id="bzMsg" role="alert"></div>
   <div class="row2"><button class="btn" type="submit" id="bzSave">Save business</button><button class="btn secondary" type="button" onclick="$('bizModal').style.display='none'">Cancel</button></div>
  </form>
@@ -591,10 +617,58 @@ body.guest .backwel{display:none}
   <button type="button" onclick="$('profMenu').style.display='none';openEdit()">✎ Edit Profile</button>
   <button type="button" onclick="$('profMenu').style.display='none';showPage('business')">🏪 For Business</button>
   <button type="button" onclick="$('profMenu').style.display='none';showPage('premium')">👑 Boost your activities</button>
+  <button type="button" onclick="$('profMenu').style.display='none';$('safetyModal').style.display='flex'">🛡 Safety &amp; Help</button>
+  <button type="button" onclick="$('profMenu').style.display='none';openBlocked()">🚫 Blocked users</button>
+  <button type="button" onclick="$('profMenu').style.display='none';openDelete()" style="color:#ff8097">🗑 Delete my account</button>
   <button type="button" id="logoutBtn" style="color:#ff8097">↩ Log Out</button>
  </div>
 </div>
 <div id="imgViewer" class="modal" style="display:none;align-items:center" onclick="this.style.display='none'"><img id="imgViewerImg" alt="Photo" style="max-width:100%;max-height:90vh;border-radius:14px"></div>
+<div id="notifModal" class="modal" style="display:none" onclick="if(event.target===this)closeNotifs()"><div class="sheet" style="padding:14px"><h3 style="margin:4px 6px 10px">Notifications</h3><div id="notifList"></div></div></div>
+<div id="userModal" class="modal" style="display:none" onclick="if(event.target===this)this.style.display='none'"><div class="sheet" id="userBox"></div></div>
+<div id="listModal" class="modal" style="display:none" onclick="if(event.target===this)this.style.display='none'"><div class="sheet" style="padding:14px"><h3 id="listTitle" style="margin:4px 6px 10px"></h3><div id="listBody"></div></div></div>
+<div id="checkoutModal" class="modal" style="display:none" onclick="if(event.target===this)this.style.display='none'"><div class="sheet" id="coBox"></div></div>
+<div id="receiptModal" class="modal" style="display:none" onclick="if(event.target===this)this.style.display='none'"><div class="sheet" id="rcBox"></div></div>
+<div id="bizDetail" class="modal" style="display:none" onclick="if(event.target===this)this.style.display='none'"><div class="sheet" id="bdBox"></div></div>
+<div id="reportModal" class="modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+ <form class="form" id="reportForm" novalidate>
+  <h2 style="margin:0 0 4px">Report</h2><p id="rpLabel" style="margin:0 0 6px;font-size:13px"></p>
+  <div class="field"><label for="rpReason">What is the problem?</label><select id="rpReason"></select></div>
+  <div class="field"><label for="rpDetails">Details (optional)</label><textarea id="rpDetails" maxlength="1000" placeholder="Tell us what happened..."></textarea></div>
+  <p style="font-size:12px;margin:0 0 6px">In immediate danger? Call Police on 15 first.</p>
+  <div class="msg" id="rpMsg" role="alert"></div>
+  <div class="row2"><button class="btn" type="submit" id="rpSave">Send report</button><button class="btn secondary" type="button" onclick="$('reportModal').style.display='none'">Cancel</button></div>
+ </form>
+</div>
+<div id="safetyModal" class="modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+ <div class="sheet" style="padding:18px">
+  <h3 style="margin:0 0 8px">🛡 Safety &amp; Help</h3>
+  <p style="margin:0 0 6px"><strong>Before you meet someone</strong></p>
+  <ul class="tipl"><li>Meet in a busy public place, in daylight where possible.</li><li>Tell a friend or family member where you are going. Use the Share button on an activity.</li><li>Do not share your home address, OTP, CNIC, or bank or wallet details.</li><li>Never send money to join an activity or to someone you met here. SCENE only takes payments inside the app.</li><li>If something feels wrong, leave. You do not owe anyone an explanation.</li><li>SCENE is for adults. You must be 18 or older.</li></ul>
+  <p style="margin:10px 0 4px"><strong>In danger?</strong></p>
+  <div class="kv"><span>Police</span><span><a href="tel:15" style="color:#c9a0ff">15</a></span></div>
+  <div class="kv"><span>Rescue</span><span><a href="tel:1122" style="color:#c9a0ff">1122</a></span></div>
+  <div class="kv"><span>Edhi ambulance</span><span><a href="tel:115" style="color:#c9a0ff">115</a></span></div>
+  <p style="margin:12px 0 4px;font-size:13px">Online fraud or harassment can also be reported through Police Helpline 15 or the NCCIA website.</p>
+  <p style="margin:10px 0 4px"><strong>Report inside SCENE</strong></p>
+  <p style="margin:0 0 10px;font-size:13px">Tap ⚑ on an activity or message, or open a profile and tap Report. You can also Block a person so you no longer see them.</p>
+  <button class="btn full" type="button" onclick="$('safetyModal').style.display='none'">Close</button>
+ </div>
+</div>
+<div id="ackModal" class="modal" style="display:none"><div class="sheet" style="padding:18px">
+  <h3 style="margin:0 0 8px">🛡 Before you join</h3>
+  <ul class="tipl"><li>Meet in a busy public place and tell a friend where you are going.</li><li>Never share OTP codes, bank details or your home address.</li><li>Never pay anyone outside SCENE. Report anything suspicious with ⚑.</li></ul>
+  <button class="btn full" type="button" onclick="confirmAck()">I understand, continue</button>
+  <button class="lnk" type="button" style="display:block;margin:12px auto 0" onclick="$('ackModal').style.display='none'">Cancel</button>
+</div></div>
+<div id="deleteModal" class="modal" style="display:none" onclick="if(event.target===this)this.style.display='none'"><div class="sheet" style="padding:18px">
+  <h3 style="margin:0 0 8px">Delete my account</h3>
+  <p style="margin:0 0 8px">This permanently deletes your profile, activities, messages, businesses and promotions. It cannot be undone.</p>
+  <div class="field"><label for="dlInput">Type DELETE to confirm</label><input id="dlInput" autocomplete="off" autocapitalize="characters"></div>
+  <button class="btn full" type="button" id="dlBtn" disabled style="background:#7a1f33" onclick="deleteAccount()">Delete my account</button>
+  <button class="lnk" type="button" style="display:block;margin:12px auto 0" onclick="$('deleteModal').style.display='none'">Cancel</button>
+</div></div>
+<div id="reqModal" class="modal" style="display:none" onclick="if(event.target===this)this.style.display='none'"><div class="sheet" style="padding:14px"><h3 id="reqTitle" style="margin:4px 6px 10px">Join requests</h3><div id="reqBody"></div></div></div>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -617,7 +691,7 @@ function browseAsGuest(){document.body.classList.add('authed','guest');showPage(
 function needLogin(reason){showAuth('signin');msg('siMsg','Please sign in to '+reason+'.','');}
 let recovering=/type=recovery/.test(location.hash);
 let appUserId=null;
-let promoTier=new Map(),rates=null,payTest=false,prefs={area:'',interests:[],subs:[]},boosted=new Set(),featBiz=[],myBiz=[],myPromos=[],chatSig='',chatForce=false,myProfile={},live=[],counts={},joined=new Set(),mine=[],names={},chatActivity=null,chatTimer=null;
+const people={};let blocked=new Set(),notifs=[],notifTimer=null,coMethod='card',bizFile=null,peopleTimer=null,promoTier=new Map(),rates=null,payTest=false,prefs={area:'',interests:[],subs:[]},boosted=new Set(),featBiz=[],myBiz=[],myPromos=[],chatSig='',chatForce=false,myProfile={},live=[],counts={},joined=new Set(),mine=[],names={},chatActivity=null,chatTimer=null;
 
 function showAuth(name){
  document.body.classList.remove('authed');
@@ -672,10 +746,10 @@ function enterApp(user){
  document.body.classList.add('authed');
  showPage('home');
  loadProfile(user);
- loadLive();loadBiz();
+ loadLive();loadBiz();loadFollowCounts();loadBlocks();startNotifs();
 }
 function leaveApp(){
- appUserId=null;mine=[];joined=new Set();closeChat();$('profMenu').style.display='none';renderMine();renderChats();myBiz=[];myPromos=[];renderBiz();myProfile={};$('editForm').style.display='none';$('profMeta').textContent='';
+ appUserId=null;mine=[];joined=new Set();closeChat();stopNotifs();blocked=new Set();$('profMenu').style.display='none';renderMine();renderChats();myBiz=[];myPromos=[];renderBiz();myProfile={};$('editForm').style.display='none';$('profMeta').textContent='';
  ['siPass','suPass','suPass2','rpPass','rpPass2'].forEach(i=>{$(i).value='';});
  if(isDesktop())browseAsGuest();else showAuth('welcome');
 }
@@ -702,8 +776,9 @@ $('signupForm').addEventListener('submit',async e=>{
  if(!EMAIL_RE.test(email))return msg('suMsg','Enter a valid email address.','err');
  if(!validPassword(p1))return msg('suMsg','Password must be at least 8 characters with a letter and a number.','err');
  if(p1!==p2)return msg('suMsg','Passwords do not match.','err');
+ if(!$('suAdult').checked)return msg('suMsg','You must be 18 or older to use SCENE.','err');
  busy('suBtn',true,'Creating account…');msg('suMsg','');
- const {data,error}=await sb.auth.signUp({email,password:p1,options:{data:{full_name:name},emailRedirectTo:SITE_URL}});
+ const {data,error}=await sb.auth.signUp({email,password:p1,options:{data:{full_name:name,adult_confirmed:true},emailRedirectTo:SITE_URL}});
  busy('suBtn',false);
  if(error)return msg('suMsg',friendly(error),'err');
  if(data.user&&data.user.identities&&data.user.identities.length===0)return msg('suMsg','This email is already registered. Try signing in instead.','err');
@@ -799,6 +874,10 @@ function searchCards(value){
  curQ=(value||'').trim().toLowerCase();
  document.querySelectorAll('.search').forEach(i=>{if(i.value!==value)i.value=value;});
  applyFilters();
+ clearTimeout(peopleTimer);
+ const q=(value||'').trim().replace(/[^\w\s.@-]/g,'');
+ if(q.length<2||!sb||!appUserId){document.querySelectorAll('[data-people]').forEach(b=>{b.innerHTML='';});return;}
+ peopleTimer=setTimeout(()=>searchPeople(q),300);
 }
 function row_invalid(){
  const m=$('createMessage');
@@ -806,6 +885,10 @@ function row_invalid(){
  if(!$('activityDate').value||!$('activityTime').value){m.textContent='Choose a date and time.';return true;}
  if(!$('activityLocation').value.trim()){m.textContent='Enter a location.';return true;}
  return false;
+}
+function setMode(m){
+ $('activityMode').value=m;
+ document.querySelectorAll('#modeBox .pm').forEach(x=>x.classList.toggle('on',x.dataset.m===m));
 }
 function setType(t){
  $('activityType').value=t;
@@ -819,9 +902,10 @@ $('createForm').addEventListener('submit',async function(e){
  if(!sb||!appUserId){needLogin('create an activity');return;}
  const f=this,btn=f.querySelector('button[type=submit]');
  if(row_invalid()){return;}
- const row={creator_id:appUserId,title:$('activityTitle').value.trim(),description:$('activityDescription').value.trim(),category:$('activityType').value,location:$('activityLocation').value.trim(),city:'Islamabad',activity_date:$('activityDate').value,activity_time:$('activityTime').value,is_public:$('activityPublic').checked};
+ const row={creator_id:appUserId,title:$('activityTitle').value.trim(),description:$('activityDescription').value.trim(),category:$('activityType').value,location:$('activityLocation').value.trim(),city:'Islamabad',activity_date:$('activityDate').value,activity_time:$('activityTime').value,is_public:$('activityMode').value!=='friends'};
  const mxRaw=$('activityMax').value.trim();
  if(mxRaw){const mx=parseInt(mxRaw,10);if(!(mx>=2&&mx<=500)){msgEl.textContent='Max members must be between 2 and 500.';return;}row.max_members=mx;}
+ if($('activityMode').value!=='open')row.join_mode=$('activityMode').value;
  const newId=crypto.randomUUID();row.id=newId;
  btn.disabled=true;
  if(coverFile){
@@ -834,7 +918,7 @@ $('createForm').addEventListener('submit',async function(e){
  const j=await sb.from('activity_members').insert({activity_id:newId,user_id:appUserId});
  if(j.error)console.warn('Creator not added as member:',j.error.message);
  msgEl.textContent='✓ Activity published!';
- f.reset();setType('Sports');resetCover();showPage('home');loadLive();
+ f.reset();setType('Sports');setMode('open');resetCover();showPage('home');loadLive();
 });
 function fitChat(){
  const w=$('chatWindow');
@@ -873,6 +957,7 @@ async function loadMessages(){
  if(id!==chatActivity)return;
  const box=$('messages');
  if(r.error){box.innerHTML='';box.appendChild(mk('div','empty','Could not load messages.'));console.warn('Messages:',r.error.message);return;}
+ r.data=r.data.filter(m=>!blocked.has(m.sender_id));
  const sig=r.data.length+':'+(r.data.length?r.data[r.data.length-1].id:'');
  if(sig===chatSig&&!chatForce)return;
  const unknown=[...new Set(r.data.map(m=>m.sender_id))].filter(x=>x&&!names[x]);
@@ -890,10 +975,12 @@ async function loadMessages(){
   if(dl!==lastDay){box.appendChild(mk('div','dsep',dl));lastDay=dl;lastSender=null;}
   const mineMsg=m.sender_id===appUserId;
   const d=mk('div','message'+(mineMsg?' mine':''));
-  if(!mineMsg&&m.sender_id!==lastSender)d.appendChild(mk('div','who',names[m.sender_id]||'Member'));
+  if(!mineMsg&&m.sender_id!==lastSender){const wh=mk('div','who',names[m.sender_id]||'Member');wh.style.cursor='pointer';wh.onclick=()=>openUser(m.sender_id);d.appendChild(wh);}
   if(m.image_url&&signed[m.image_url]){const im=document.createElement('img');im.className='msgimg';im.alt='Photo';im.src=signed[m.image_url];im.onclick=()=>openViewer(im.src);im.onload=()=>{if(stick)box.scrollTop=box.scrollHeight;};d.appendChild(im);}
   if(m.content&&!(m.image_url&&m.content==='📷 Photo'))d.appendChild(mk('div','',m.content));
-  d.appendChild(mk('div','tm',dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})));
+  const tmEl=mk('div','tm',dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+  if(!mineMsg){const fl=mk('span','flag','⚑');fl.title='Report this message';fl.onclick=()=>openReport('message',m.id,'a message');tmEl.appendChild(fl);}
+  d.appendChild(tmEl);
   box.appendChild(d);lastSender=m.sender_id;
  });
  if(chatForce||near)box.scrollTop=box.scrollHeight;
@@ -948,12 +1035,12 @@ $('editForm').addEventListener('submit',async e=>{
 });
 
 /* ============ EDIT / DELETE ACTIVITY ============ */
-let editId=null;
+let editId=null,editObj=null,myReqs={},hostReqs=[];
 function openEditAct(a){
  editId=a.id;
  $('eaTitle').value=a.title||'';$('eaType').value=a.category||'Sports';$('eaDesc').value=a.description||'';
  $('eaDate').value=a.activity_date||'';$('eaTime').value=a.activity_time?String(a.activity_time).slice(0,5):'';
- $('eaLoc').value=a.location||'';$('eaMax').value=a.max_members||'';$('eaPub').value=a.is_public===false?'0':'1';
+ $('eaLoc').value=a.location||'';$('eaMax').value=a.max_members||'';$('eaMode').value=(a.join_mode&&a.join_mode!=='open')?a.join_mode:(a.is_public===false?'private':'open');editObj=a;
  msg('eaMsg','');$('editActModal').style.display='flex';
 }
 function closeEditAct(){$('editActModal').style.display='none';editId=null;}
@@ -970,7 +1057,9 @@ $('editActForm').addEventListener('submit',async e=>{
  const cur=(counts[editId]||0);
  if(mx&&mx<cur)return msg('eaMsg','Already '+cur+' members joined. Max cannot be lower than that.','err');
  busy('eaSave',true,'Saving…');msg('eaMsg','');
- const row={title,category:$('eaType').value,description:$('eaDesc').value.trim(),location:loc,activity_date:date,activity_time:time,is_public:$('eaPub').value==='1',max_members:mx};
+ const row={title,category:$('eaType').value,description:$('eaDesc').value.trim(),location:loc,activity_date:date,activity_time:time,is_public:($('eaMode').value==='open'||$('eaMode').value==='request'),max_members:mx};
+ const jm=$('eaMode').value==='private'?'open':$('eaMode').value;
+ if(jm!==((editObj&&editObj.join_mode)||'open'))row.join_mode=jm;
  const r=await sb.from('activities').update(row).eq('id',editId).select('id');
  busy('eaSave',false);
  if(r.error)return msg('eaMsg','Could not save: '+r.error.message,'err');
@@ -1000,7 +1089,10 @@ function renderFeatured(){
  const g=$('featGrid');g.innerHTML='';
  featBiz.forEach(b=>{
   const top=b._tier==='top_spot';
-  const c=mk('article','card'+(top?' top':' boost'));c.appendChild(mk('div','cover cafe','🏪'));
+  const c=mk('article','card'+(top?' top':' boost'));c.style.cursor='pointer';c.onclick=()=>openBizDetail(b);
+  const bu=safeImg(b.image_url,'activity-covers'),bcv=mk('div','cover cafe','🏪');
+  if(bu)loadImg(bu,()=>{bcv.style.backgroundImage='url("'+bu+'")';bcv.classList.add('photo');bcv.textContent='';});
+  c.appendChild(bcv);
   const bd=mk('div','card-body');bd.appendChild(mk('div','tag',(top?'👑 Top Spot':'⭐ Featured')+' · '+(b.category||'Business')));
   bd.appendChild(mk('h3','',b.name||'Business'));
   if(b.address)bd.appendChild(mk('div','meta','📍 '+b.address));
@@ -1058,7 +1150,7 @@ function renderBiz(){
  const rq=mk('button','btn small','Promote now');rq.type='button';rq.onclick=openPromo;row.appendChild(rq);
  box.appendChild(row);
  if(myPromos.length){
-  box.appendChild(mk('h3','','Your promotions'));
+  box.appendChild(mk('h3','','Payments & receipts'));
   myPromos.forEach(x=>{
    const biz=myBiz.find(b=>b.id===x.business_id),ac=[...mine,...live].find(a=>a.id===x.activity_id);
    const r=mk('div','bizrow');const l=mk('div','');
@@ -1071,10 +1163,10 @@ function renderBiz(){
    const rt=mk('div','');rt.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:wrap';
    rt.appendChild(promoBadge(x.status));
    if(x.status==='awaiting_payment'){
-    const pay=mk('button','btn small','Pay '+fmtRs(x.amount));pay.type='button';pay.onclick=()=>payPromotion(x);rt.appendChild(pay);
-    const cn=mk('button','btn secondary small','Cancel');cn.type='button';cn.onclick=()=>cancelPromo(x);rt.appendChild(cn);
+    const pay=mk('button','btn small','Pay '+fmtRs(x.amount));pay.type='button';pay.onclick=e=>{e.stopPropagation();openCheckout(x);};rt.appendChild(pay);
+    const cn=mk('button','btn secondary small','Cancel');cn.type='button';cn.onclick=e=>{e.stopPropagation();cancelPromo(x);};rt.appendChild(cn);
    }
-   r.appendChild(rt);box.appendChild(r);
+   r.appendChild(rt);r.style.cursor='pointer';r.onclick=()=>openReceipt(x);box.appendChild(r);
   });
  }
 }
@@ -1093,7 +1185,7 @@ function bizAction(k){
  if(!sb||!appUserId){needLogin(k==='register'?'register your business':'request a promotion');return;}
  if(k==='register')openBiz();else openPromo();
 }
-function openBiz(){['bzName','bzDesc','bzAddr'].forEach(i=>{$(i).value='';});msg('bzMsg','');$('bizModal').style.display='flex';}
+function openBiz(){['bzName','bzDesc','bzAddr'].forEach(i=>{$(i).value='';});bizFile=null;$('bzPhotoName').textContent='';msg('bzMsg','');$('bizModal').style.display='flex';}
 $('bizModal').addEventListener('click',e=>{if(e.target===$('bizModal'))$('bizModal').style.display='none';});
 $('promoModal').addEventListener('click',e=>{if(e.target===$('promoModal'))$('promoModal').style.display='none';});
 $('bizForm').addEventListener('submit',async e=>{
@@ -1104,10 +1196,14 @@ $('bizForm').addEventListener('submit',async e=>{
  if(!addr)return msg('bzMsg','Enter your address.','err');
  busy('bzSave',true,'Sending…');msg('bzMsg','');
  const row={id:crypto.randomUUID(),owner_id:appUserId,name,category:$('bzCat').value,description:$('bzDesc').value.trim()||null,address:addr,city:'Islamabad'};
+ if(bizFile){
+  try{const bp=appUserId+'/biz-'+row.id+'.jpg';await uploadImage('activity-covers',bp,bizFile,1280);row.image_url=pubUrl('activity-covers',bp);}
+  catch(er){busy('bzSave',false);return msg('bzMsg','Photo upload failed: '+(er.message||er),'err');}
+ }
  const r=await sb.from('businesses').insert(row);
  busy('bzSave',false);
  if(r.error)return msg('bzMsg','Could not submit: '+r.error.message,'err');
- $('bizModal').style.display='none';toast('Business saved. Promote it to make it visible to everyone.');loadBiz();
+ $('bizModal').style.display='none';bizFile=null;toast('Business saved. Promote it to make it visible to everyone.');loadBiz();
 });
 function ownActs(){return mine.filter(a=>a.creator_id===appUserId);}
 function fillSel(sel,items,lab){sel.innerHTML='';items.forEach(x=>{const o=document.createElement('option');o.value=x.id;o.textContent=lab(x);sel.appendChild(o);});}
@@ -1155,16 +1251,6 @@ function syncPromo(){
 }
 ['prType','prWhat'].forEach(id=>$(id).addEventListener('change',syncPromo));
 $('prDays').addEventListener('input',syncPromo);
-async function payPromotion(p){
- if(!sb||!appUserId)return;
- if(payTest){
-  const r=await sb.rpc('simulate_payment',{p_id:p.id});
-  if(r.error){toast('Payment failed: '+r.error.message);return;}
-  toast('Test payment done. Your promotion is live.');await loadBiz();loadLive();return;
- }
- try{const r=await sb.functions.invoke('create-checkout',{body:{promotion_id:p.id}});if(r.data&&r.data.url){location.href=r.data.url;return;}}catch(e){}
- toast('Saved. Online payment is not connected yet.');
-}
 async function cancelPromo(p){
  if(!confirm('Cancel this unpaid request?'))return;
  const r=await sb.from('promotions').update({status:'cancelled'}).eq('id',p.id).select('id');
@@ -1186,7 +1272,7 @@ $('promoForm').addEventListener('submit',async e=>{
  if(ins.error)return msg('prMsg','Could not create: '+ins.error.message,'err');
  $('promoModal').style.display='none';
  row.amount=r.price_per_day*n;
- await loadBiz();payPromotion(row);
+ await loadBiz();openCheckout(row);
 });
 async function loadRates(){
  rates=DEFAULT_RATES;
@@ -1230,9 +1316,7 @@ function scoreAct(a){
 }
 function distLabel(a){const d=distTo(a);if(d==null)return '';return d<0.5?' · Same sector':' · ≈ '+Math.max(1,Math.round(d))+' km';}
 function renderPrefBar(){
- const bits=[];if(prefs.area)bits.push('📍 '+prefs.area);
- if(prefs.interests.length||prefs.subs.length)bits.push([...prefs.interests,...prefs.subs].join(', '));
- $('prefText').textContent=bits.length?bits.join(' · '):'Showing activities across Islamabad';
+ const el=$('locText');if(el)el.textContent=prefs.area||'Islamabad';
 }
 function openPrefs(){
  const a=$('pfArea');a.innerHTML='<option value="">Not set</option>'+SECTORS.map(x=>'<option>'+x+'</option>').join('');a.value=prefs.area||'';
@@ -1323,6 +1407,396 @@ function attachPhoto(){
 let pTab='created';
 function setPTab(t){pTab=t;document.querySelectorAll('.ptab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));renderMine();}
 
+/* ============ SOCIAL, NOTIFICATIONS, CHECKOUT ============ */
+const PAY_METHODS=[{id:'card',icon:'💳',label:'Card',sub:'Visa, Mastercard'},{id:'jazzcash',icon:'📱',label:'JazzCash',sub:'Mobile wallet'},{id:'easypaisa',icon:'📱',label:'Easypaisa',sub:'Mobile wallet'}];
+function avatarEl(p,size){
+ const a=mk('div','avatar mini',((p.full_name||p.username||'?')[0]||'?').toUpperCase());
+ a.style.width=a.style.height=size+'px';a.style.fontSize=Math.round(size*0.42)+'px';
+ const u=safeImg(p.avatar_url,'avatars');
+ if(u)loadImg(u,()=>{a.style.backgroundImage='url("'+u+'")';a.classList.add('photo');a.textContent='';});
+ return a;
+}
+function personRow(x){
+ const r=mk('div','bizrow');r.style.cursor='pointer';r.onclick=()=>{$('listModal').style.display='none';openUser(x.id);};
+ const l=mk('div','');l.style.cssText='display:flex;gap:12px;align-items:center';l.appendChild(avatarEl(x,42));
+ const t=mk('div','');t.appendChild(mk('strong','',x.full_name||x.username||'User'));if(x.username)t.appendChild(mk('div','meta','@'+x.username));
+ l.appendChild(t);r.appendChild(l);return r;
+}
+async function loadPeople(ids){
+ const need=[...new Set(ids)].filter(x=>x&&!people[x]);
+ if(!need.length||!sb)return;
+ const r=await sb.from('profiles').select('id,full_name,username,avatar_url').in('id',need);
+ (r.data||[]).forEach(x=>{people[x.id]=x;names[x.id]=x.full_name||x.username||'Member';});
+}
+async function searchPeople(q){
+ const r=await sb.from('profiles').select('id,full_name,username,avatar_url').or('full_name.ilike.%'+q+'%,username.ilike.%'+q+'%').limit(6);
+ const rows=(r.data||[]).filter(x=>x.id!==appUserId&&!blocked.has(x.id));
+ document.querySelectorAll('[data-people]').forEach(box=>{
+  box.innerHTML='';if(!rows.length)return;
+  box.appendChild(mk('div','meta','People'));rows.forEach(x=>box.appendChild(personRow(x)));
+ });
+}
+async function loadFollowCounts(){
+ if(!sb||!appUserId)return;
+ try{
+  const a=await sb.from('follows').select('follower_id',{count:'exact',head:true}).eq('following_id',appUserId);
+  const b=await sb.from('follows').select('following_id',{count:'exact',head:true}).eq('follower_id',appUserId);
+  $('stFollowers').textContent=a.count||0;$('stFollowing').textContent=b.count||0;
+ }catch(e){console.warn('Follow counts not loaded');}
+}
+async function showFollowList(kind,uid){
+ if(!sb||!appUserId)return;
+ $('listTitle').textContent=kind==='followers'?'Followers':'Following';$('listBody').innerHTML='';$('listModal').style.display='flex';
+ const col=kind==='followers'?'follower_id':'following_id',other=kind==='followers'?'following_id':'follower_id';
+ const r=await sb.from('follows').select(col).eq(other,uid).limit(100);
+ const ids=(r.data||[]).map(x=>x[col]);
+ if(!ids.length){$('listBody').appendChild(mk('div','empty','Nobody here yet.'));return;}
+ const p=await sb.from('profiles').select('id,full_name,username,avatar_url').in('id',ids);
+ (p.data||[]).forEach(x=>$('listBody').appendChild(personRow(x)));
+}
+async function openUser(id){
+ if(!sb||!id)return;
+ if(!appUserId){needLogin('view profiles');return;}
+ const box=$('userBox');box.innerHTML='';box.appendChild(mk('p','','Loading…'));$('userModal').style.display='flex';
+ try{
+  const [pr,fr,fg,me,ac]=await Promise.all([
+   sb.from('profiles').select('*').eq('id',id).maybeSingle(),
+   sb.from('follows').select('follower_id',{count:'exact',head:true}).eq('following_id',id),
+   sb.from('follows').select('following_id',{count:'exact',head:true}).eq('follower_id',id),
+   sb.from('follows').select('follower_id').eq('follower_id',appUserId).eq('following_id',id).maybeSingle(),
+   sb.from('activities').select('id,title,category,activity_date').eq('creator_id',id).eq('is_public',true).order('activity_date',{ascending:false}).limit(6)]);
+  renderUserCard(pr.data||{id},fr.count||0,fg.count||0,!!me.data,ac.data||[]);
+ }catch(e){box.innerHTML='';box.appendChild(mk('p','','Could not load this profile.'));}
+}
+function renderUserCard(p,followers,following,isF,acts){
+ const box=$('userBox');box.innerHTML='';
+ const top=mk('div','');top.style.textAlign='center';
+ const av=avatarEl(p,96);av.style.margin='4px auto 8px';av.style.border='3px solid #c28aff';top.appendChild(av);
+ top.appendChild(mk('h3','',p.full_name||p.username||'User'));
+ if(p.username)top.appendChild(mk('div','purple','@'+p.username));
+ const st=mk('div','stats');
+ const fN=mk('strong','',String(followers)),gN=mk('strong','',String(following));
+ const d1=mk('div','');d1.appendChild(fN);d1.appendChild(mk('span','','Followers'));
+ const d2=mk('div','');d2.appendChild(gN);d2.appendChild(mk('span','','Following'));
+ const d3=mk('div','');d3.appendChild(mk('strong','',String(acts.length)));d3.appendChild(mk('span','','Activities'));
+ st.appendChild(d3);st.appendChild(d1);st.appendChild(d2);top.appendChild(st);
+ const meta=[p.city?'📍 '+p.city:'',p.bio||''].filter(Boolean).join(' — ');
+ if(meta)top.appendChild(mk('p','',meta));
+ if(p.id!==appUserId){
+  const state={on:isF,n:followers};
+  const b=mk('button',state.on?'btn secondary full':'btn full',state.on?'Following ✓':'Follow');b.type='button';
+  b.onclick=async()=>{
+   b.disabled=true;
+   const r=state.on?await sb.from('follows').delete().eq('follower_id',appUserId).eq('following_id',p.id):await sb.from('follows').insert({follower_id:appUserId,following_id:p.id});
+   b.disabled=false;
+   if(r.error&&r.error.code!=='23505'){toast('Could not update: '+r.error.message);return;}
+   state.on=!state.on;state.n+=state.on?1:-1;fN.textContent=state.n;
+   b.textContent=state.on?'Following ✓':'Follow';b.className=state.on?'btn secondary full':'btn full';loadFollowCounts();
+  };
+  top.appendChild(b);
+  const sr=mk('div','');sr.style.cssText='display:flex;gap:10px;margin-top:10px';
+  const rb=mk('button','btn secondary small','⚑ Report');rb.type='button';rb.style.flex='1';rb.onclick=()=>{$('userModal').style.display='none';openReport('user',p.id,p.full_name||p.username||'this person');};
+  const bb=mk('button','btn danger small','🚫 Block');bb.type='button';bb.style.flex='1';bb.onclick=()=>blockUser(p.id,p.full_name||p.username);
+  sr.appendChild(rb);sr.appendChild(bb);top.appendChild(sr);
+ }
+ box.appendChild(top);
+ if(acts.length){
+  box.appendChild(mk('h3','','Activities'));
+  acts.forEach(a=>{const r=mk('div','bizrow');const l=mk('div','');l.appendChild(mk('strong','',a.title));l.appendChild(mk('div','meta',[a.category,a.activity_date].filter(Boolean).join(' · ')));r.appendChild(l);box.appendChild(r);});
+ }
+}
+
+/* notifications: built from real activity (messages, joins, followers, promotions) */
+const SEEN_KEY='scene_seen';
+function lastSeen(){try{return localStorage.getItem(SEEN_KEY)||new Date(Date.now()-7*864e5).toISOString();}catch(e){return new Date(Date.now()-7*864e5).toISOString();}}
+async function loadNotifs(){
+ if(!sb||!appUserId)return;
+ const since=lastSeen(),uid=appUserId,items=[];
+ const title=id=>{const a=mine.find(x=>x.id===id);return a?a.title:'an activity';};
+ try{
+  const myActs=mine.map(a=>a.id),created=mine.filter(a=>a.creator_id===uid).map(a=>a.id);
+  if(myActs.length){
+   const m=await sb.from('messages').select('activity_id,sender_id,created_at').in('activity_id',myActs).neq('sender_id',uid).gt('created_at',since).order('created_at',{ascending:false}).limit(50);
+   const by={};(m.data||[]).forEach(x=>{(by[x.activity_id]=by[x.activity_id]||{n:0,t:x.created_at}).n++;});
+   Object.keys(by).forEach(id=>items.push({t:by[id].t,icon:'💬',text:by[id].n+' new message'+(by[id].n>1?'s':'')+' in '+title(id),go:()=>{showPage('chat');openActivityChat(id,title(id),mine.find(x=>x.id===id));}}));
+  }
+  if(created.length){
+   const j=await sb.from('activity_members').select('activity_id,user_id,joined_at').in('activity_id',created).neq('user_id',uid).gt('joined_at',since).order('joined_at',{ascending:false}).limit(30);
+   await loadPeople((j.data||[]).map(x=>x.user_id));
+   (j.data||[]).forEach(x=>items.push({t:x.joined_at,icon:'🙋',text:(names[x.user_id]||'Someone')+' joined '+title(x.activity_id),go:()=>openUser(x.user_id)}));
+  }
+  const f=await sb.from('follows').select('follower_id,created_at').eq('following_id',uid).gt('created_at',since).order('created_at',{ascending:false}).limit(30);
+  await loadPeople((f.data||[]).map(x=>x.follower_id));
+  (f.data||[]).forEach(x=>items.push({t:x.created_at,icon:'➕',text:(names[x.follower_id]||'Someone')+' started following you',go:()=>openUser(x.follower_id)}));
+  const titleAny=id=>{const a=mine.find(x=>x.id===id)||live.find(x=>x.id===id);return a?a.title:'an activity';};
+  if(created.length){
+   const pq=await sb.from('join_requests').select('activity_id,created_at').in('activity_id',created).eq('status','pending');
+   const pb={};(pq.data||[]).forEach(x=>{(pb[x.activity_id]=pb[x.activity_id]||{n:0,t:x.created_at}).n++;});
+   Object.keys(pb).forEach(id=>items.push({t:pb[id].t,icon:'✋',text:pb[id].n+' request'+(pb[id].n>1?'s':'')+' to join '+titleAny(id),go:()=>openRequests(id)}));
+  }
+  const dr=await sb.from('join_requests').select('activity_id,status,decided_at').eq('user_id',uid).neq('status','pending').gt('decided_at',since).limit(20);
+  (dr.data||[]).forEach(x=>items.push({t:x.decided_at,icon:x.status==='approved'?'✅':'❌',text:'Your request to join '+titleAny(x.activity_id)+' was '+x.status,go:()=>showPage('home')}));
+  const pr=await sb.from('promotions').select('promotion_type,paid_at').eq('owner_id',uid).not('paid_at','is',null).gt('paid_at',since).limit(10);
+  (pr.data||[]).forEach(x=>items.push({t:x.paid_at,icon:'🚀',text:'Your '+(PROMO_LABEL[x.promotion_type]||'promotion')+' is live',go:()=>showPage('business')}));
+ }catch(e){console.warn('Notifications not loaded:',e.message||e);}
+ if(uid!==appUserId)return;
+ notifs=items.sort((a,b)=>String(b.t).localeCompare(String(a.t)));
+ const d=$('bellDot');d.textContent=notifs.length>9?'9+':notifs.length;d.style.display=notifs.length?'grid':'none';
+}
+function startNotifs(){stopNotifs();notifTimer=setInterval(loadNotifs,90000);}
+function stopNotifs(){clearInterval(notifTimer);notifs=[];const d=$('bellDot');if(d)d.style.display='none';}
+function openNotifs(){
+ if(!appUserId){needLogin('see notifications');return;}
+ const box=$('notifList');box.innerHTML='';
+ if(!notifs.length)box.appendChild(mk('div','empty','You are all caught up. 🎉'));
+ notifs.forEach(n=>{
+  const r=mk('div','bizrow');r.style.cursor='pointer';
+  const l=mk('div','');l.style.cssText='display:flex;gap:12px;align-items:center';l.appendChild(mk('span','',n.icon));
+  const t=mk('div','');t.appendChild(mk('div','',n.text));t.appendChild(mk('div','meta',new Date(n.t).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})));
+  l.appendChild(t);r.appendChild(l);r.onclick=()=>{closeNotifs();n.go();};box.appendChild(r);
+ });
+ $('notifModal').style.display='flex';
+}
+function closeNotifs(){
+ $('notifModal').style.display='none';
+ try{localStorage.setItem(SEEN_KEY,new Date().toISOString());}catch(e){}
+ notifs=[];$('bellDot').style.display='none';
+}
+
+/* top banner: promoted activities and businesses with their photos */
+function renderBanner(){
+ const box=$('promoBanner');box.innerHTML='';
+ const items=[];
+ live.filter(a=>promoTier.has(a.id)).forEach(a=>items.push({tier:promoTier.get(a.id),a,title:a.title,img:safeImg(a.image_url,'activity-covers'),sub:[when(a),a.location].filter(Boolean).join(' · '),tag:a.category||'Activity'}));
+ featBiz.forEach(b=>items.push({tier:b._tier,b,title:b.name,img:safeImg(b.image_url,'activity-covers'),sub:[b.category,b.address].filter(Boolean).join(' · '),tag:b.category||'Business'}));
+ items.sort((x,y)=>(y.tier==='top_spot'?1:0)-(x.tier==='top_spot'?1:0));
+ if(!items.length){
+  const c=mk('div','bnr one');c.appendChild(mk('div','tag','YOUR EVENT COULD BE HERE'));c.appendChild(mk('h3','','Promote your activity or business'));
+  c.appendChild(mk('div','meta','Reach people across Islamabad. Pay per day and start right after payment.'));
+  const btn=mk('button','btn small','Promote now');btn.type='button';btn.onclick=()=>bizAction('promo');c.appendChild(btn);box.appendChild(c);return;
+ }
+ const list=items.slice(0,6);
+ list.forEach(it=>{
+  const c=mk('div','bnr'+(it.tier==='top_spot'?' gold':'')+(list.length===1?' one':''));
+  if(it.img)loadImg(it.img,()=>{c.style.backgroundImage='linear-gradient(180deg,#09071400 20%,#090714f2),url("'+it.img+'")';});
+  c.appendChild(mk('div','tag',(it.tier==='top_spot'?'👑 Top Spot':'⭐ Featured')+' · '+it.tag));
+  c.appendChild(mk('h3','',it.title));c.appendChild(mk('div','meta',it.sub));
+  let btn;
+  if(it.a){const a=it.a;
+   if(joined.has(a.id)){btn=mk('button','btn small','Open chat');btn.onclick=()=>{showPage('chat');openActivityChat(a.id,a.title,a);};}
+   else{btn=mk('button','btn small',a.join_mode==='request'?'Request to join':'Join');btn.onclick=()=>joinOrRequest(a,btn);}
+  }else{const b=it.b;btn=mk('button','btn small','View');btn.onclick=()=>openBizDetail(b);}
+  btn.type='button';c.appendChild(btn);box.appendChild(c);
+ });
+}
+function openBizDetail(b){
+ const box=$('bdBox');box.innerHTML='';
+ const bu=safeImg(b.image_url,'activity-covers');
+ if(bu){const im=document.createElement('img');im.src=bu;im.alt=b.name||'Business';im.style.cssText='width:100%;height:190px;object-fit:cover;border-radius:14px';box.appendChild(im);}
+ const h=mk('h3','',b.name||'Business');h.style.margin='12px 2px 4px';box.appendChild(h);
+ box.appendChild(mk('div','meta',[b.category,b.address].filter(Boolean).join(' · ')));
+ if(b.description){const p=mk('p','',b.description);p.style.margin='10px 2px';box.appendChild(p);}
+ const a=document.createElement('a');a.className='btn full';a.style.cssText='display:block;text-align:center;margin-top:12px;text-decoration:none';
+ a.textContent='📍 Open in Maps';a.target='_blank';a.rel='noopener';
+ a.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((b.name||'')+' '+(b.address||''));
+ box.appendChild(a);$('bizDetail').style.display='flex';
+}
+function pickBizPhoto(){pickImage(f=>{bizFile=f;$('bzPhotoName').textContent=f.name;$('bzPhotoBtn').textContent='📷 Change photo';});}
+
+/* checkout, payment and receipt */
+function targetName(p){const biz=myBiz.find(b=>b.id===p.business_id),ac=[...mine,...live].find(a=>a.id===p.activity_id);return (biz?biz.name:ac?ac.title:'')||'';}
+function kv(a,b){const r=mk('div','kv');r.appendChild(mk('span','',a));r.appendChild(mk('span','',b));return r;}
+const fmtDate=d=>d?new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'-';
+function openCheckout(p){
+ coMethod='card';
+ const box=$('coBox');box.innerHTML='';
+ const hd=mk('div','');hd.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px';
+ hd.appendChild(mk('h3','','Checkout'));
+ const x=mk('button','back','✕');x.type='button';x.style.fontSize='20px';x.onclick=()=>{$('checkoutModal').style.display='none';};hd.appendChild(x);box.appendChild(hd);
+ const info=TIER_INFO[p.promotion_type]||['✨',''];
+ const sm=mk('div','bizrow');const l=mk('div','');
+ l.appendChild(mk('strong','',info[0]+' '+(PROMO_LABEL[p.promotion_type]||'Promotion')));
+ l.appendChild(mk('div','meta',[targetName(p),p.days+' day'+(p.days===1?'':'s')].filter(Boolean).join(' · ')));sm.appendChild(l);box.appendChild(sm);
+ const pb=mk('div','pricebox');
+ const per=p.days?p.amount/p.days:p.amount;
+ pb.appendChild(kv(fmtRs(per)+' × '+p.days+' day'+(p.days===1?'':'s'),fmtRs(p.amount)));
+ const tot=kv('Total',fmtRs(p.amount));tot.style.cssText+='font-weight:800;font-size:17px;border-bottom:0';tot.firstChild.style.color='#fff';pb.appendChild(tot);box.appendChild(pb);
+ box.appendChild(mk('div','meta','Starts right after payment and runs for the days you chose.'));
+ const ready=payTest||PAYMENTS_LIVE;
+ const lab=mk('div','');lab.style.cssText='margin:14px 0 4px;font-weight:700';lab.textContent='Pay with';box.appendChild(lab);
+ const rows=[];
+ PAY_METHODS.forEach(m=>{
+  const r=mk('div','pm'+(m.id===coMethod?' on':''));
+  r.appendChild(mk('span','',m.icon));const t=mk('div','');t.appendChild(mk('strong','',m.label));t.appendChild(mk('div','meta',m.sub));r.appendChild(t);r.appendChild(mk('span','rd',''));
+  r.onclick=()=>{coMethod=m.id;rows.forEach(x=>x.classList.remove('on'));r.classList.add('on');};rows.push(r);box.appendChild(r);
+ });
+ const note=mk('div','msg',ready?(payTest?'🧪 Test mode: no real money is charged.':'🔒 You enter card or wallet details on our payment partner\'s secure page, never inside SCENE.'):'Online payment is not active yet. Your request is saved, and you can pay as soon as it is switched on.');
+ note.style.minHeight='0';note.style.margin='10px 0';box.appendChild(note);
+ const pay=mk('button','btn full','Pay '+fmtRs(p.amount));pay.type='button';pay.style.padding='15px';pay.disabled=!ready;
+ pay.onclick=async()=>{pay.disabled=true;pay.textContent='Processing…';const ok=await payPromotion(p,coMethod);if(!ok){pay.disabled=!ready;pay.textContent='Pay '+fmtRs(p.amount);}};
+ box.appendChild(pay);
+ const cn=mk('button','lnk','Cancel this request');cn.type='button';cn.style.cssText='display:block;margin:12px auto 0';cn.onclick=async()=>{await cancelPromo(p);$('checkoutModal').style.display='none';};box.appendChild(cn);
+ $('checkoutModal').style.display='flex';
+}
+async function payPromotion(p,method){
+ if(!sb||!appUserId)return false;
+ if(payTest){
+  const r=await sb.rpc('simulate_payment',{p_id:p.id});
+  if(r.error){toast('Payment failed: '+r.error.message);return false;}
+  await loadBiz();loadLive();showPaid(myPromos.find(x=>x.id===p.id)||p);return true;
+ }
+ try{const r=await sb.functions.invoke('create-checkout',{body:{promotion_id:p.id,method:method}});if(r.data&&r.data.url){location.href=r.data.url;return true;}}catch(e){}
+ toast('Online payment is not connected yet.');return false;
+}
+function showPaid(p){
+ const box=$('coBox');box.innerHTML='';
+ box.appendChild(mk('div','okmark','✓'));
+ const h=mk('h3','','Payment successful');h.style.textAlign='center';box.appendChild(h);
+ const t=mk('p','','Your '+(PROMO_LABEL[p.promotion_type]||'promotion')+' is live'+(p.ends_at?' until '+fmtDate(p.ends_at):'')+'.');t.style.textAlign='center';box.appendChild(t);
+ const pb=mk('div','pricebox');pb.appendChild(kv('Amount paid',fmtRs(p.amount)));box.appendChild(pb);
+ const rc=mk('button','btn secondary full','View receipt');rc.type='button';rc.onclick=()=>{$('checkoutModal').style.display='none';openReceipt(p);};box.appendChild(rc);
+ const dn=mk('button','btn full','Done');dn.type='button';dn.style.marginTop='8px';dn.onclick=()=>{$('checkoutModal').style.display='none';};box.appendChild(dn);
+}
+function openReceipt(p){
+ const box=$('rcBox');box.innerHTML='';
+ const hd=mk('div','');hd.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px';
+ hd.appendChild(mk('h3','',p.paid_at?'Receipt':'Promotion details'));
+ const x=mk('button','back','✕');x.type='button';x.style.fontSize='20px';x.onclick=()=>{$('receiptModal').style.display='none';};hd.appendChild(x);box.appendChild(hd);
+ box.appendChild(kv('Promotion',PROMO_LABEL[p.promotion_type]||p.promotion_type));
+ box.appendChild(kv('For',targetName(p)||'-'));
+ box.appendChild(kv('Duration',p.days?p.days+' day'+(p.days===1?'':'s'):'-'));
+ box.appendChild(kv('Amount',p.amount!=null?fmtRs(p.amount):'-'));
+ const st=mk('div','kv');st.appendChild(mk('span','','Status'));st.appendChild(promoBadge(p.status));box.appendChild(st);
+ if(p.paid_at)box.appendChild(kv('Paid on',fmtDate(p.paid_at)));
+ if(p.starts_at)box.appendChild(kv('Runs',fmtDate(p.starts_at)+' – '+fmtDate(p.ends_at)));
+ if(p.payment_ref)box.appendChild(kv('Reference',p.payment_ref));
+ if(p.status==='awaiting_payment'){const b=mk('button','btn full','Pay '+fmtRs(p.amount));b.type='button';b.style.marginTop='14px';b.onclick=()=>{$('receiptModal').style.display='none';openCheckout(p);};box.appendChild(b);}
+ $('receiptModal').style.display='flex';
+}
+renderBanner();
+
+/* ============ SAFETY: report, block, tips, share, delete account ============ */
+const REASONS=[['scam','Scam or fraud'],['fake','Fake or misleading'],['harassment','Harassment or threats'],['unsafe','Unsafe or suspicious meetup'],['inappropriate','Inappropriate content or photo'],['other','Something else']];
+let reportTarget=null,ackCb=null;
+function openReport(type,id,label){
+ if(!appUserId){needLogin('report');return;}
+ reportTarget={type:type,id:id};
+ $('rpLabel').textContent=label?'Reporting '+label:'';
+ const sel=$('rpReason');sel.innerHTML='';
+ REASONS.forEach(r=>{const o=document.createElement('option');o.value=r[0];o.textContent=r[1];sel.appendChild(o);});
+ $('rpDetails').value='';msg('rpMsg','');$('reportModal').style.display='flex';
+}
+$('reportForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ if(!sb||!appUserId||!reportTarget)return;
+ busy('rpSave',true,'Sending…');
+ const r=await sb.from('reports').insert({reporter_id:appUserId,target_type:reportTarget.type,target_id:reportTarget.id,reason:$('rpReason').value,details:$('rpDetails').value.trim().slice(0,1000)||null});
+ busy('rpSave',false);
+ if(r.error)return msg('rpMsg','Could not send: '+r.error.message,'err');
+ $('reportModal').style.display='none';toast('Thank you. Our team will review your report.');
+});
+async function loadBlocks(){
+ if(!sb||!appUserId)return;
+ try{const r=await sb.from('blocks').select('blocked_id').eq('blocker_id',appUserId);blocked=new Set((r.data||[]).map(x=>x.blocked_id));renderLive();}catch(e){}
+}
+async function blockUser(id,name){
+ if(!confirm('Block '+(name||'this person')+'? You will no longer see their activities or messages.'))return;
+ const r=await sb.from('blocks').insert({blocker_id:appUserId,blocked_id:id});
+ if(r.error&&r.error.code!=='23505'){toast('Could not block: '+r.error.message);return;}
+ blocked.add(id);$('userModal').style.display='none';renderLive();toast('Blocked');
+}
+async function openBlocked(){
+ if(!sb||!appUserId)return;
+ $('listTitle').textContent='Blocked users';const body=$('listBody');body.innerHTML='';$('listModal').style.display='flex';
+ const ids=[...blocked];
+ if(!ids.length){body.appendChild(mk('div','empty','You have not blocked anyone.'));return;}
+ const p=await sb.from('profiles').select('id,full_name,username,avatar_url').in('id',ids);
+ (p.data||[]).forEach(x=>{
+  const r=mk('div','bizrow');const l=mk('div','');l.style.cssText='display:flex;gap:12px;align-items:center';l.appendChild(avatarEl(x,42));
+  l.appendChild(mk('strong','',x.full_name||x.username||'User'));r.appendChild(l);
+  const b=mk('button','btn secondary small','Unblock');b.type='button';
+  b.onclick=async()=>{const d=await sb.from('blocks').delete().eq('blocker_id',appUserId).eq('blocked_id',x.id);if(d.error){toast('Could not unblock: '+d.error.message);return;}blocked.delete(x.id);r.remove();renderLive();};
+  r.appendChild(b);body.appendChild(r);
+ });
+}
+function safetyAcked(){try{return localStorage.getItem('scene_safety_ack')==='1';}catch(e){return true;}}
+function showSafetyAck(cb){ackCb=cb;$('ackModal').style.display='flex';}
+function confirmAck(){try{localStorage.setItem('scene_safety_ack','1');}catch(e){}$('ackModal').style.display='none';if(ackCb){const f=ackCb;ackCb=null;f();}}
+async function shareActivity(a){
+ const text=(a.title||'Activity')+' on SCENE · '+[when(a),a.location].filter(Boolean).join(' · ');
+ try{if(navigator.share){await navigator.share({title:a.title||'SCENE',text:text,url:SITE_URL});return;}}catch(e){if(e&&e.name==='AbortError')return;}
+ try{await navigator.clipboard.writeText(text+' '+SITE_URL);toast('Copied. Send it to a friend.');}catch(e){toast('Could not share');}
+}
+function openDelete(){$('dlInput').value='';$('dlBtn').disabled=true;$('dlBtn').textContent='Delete my account';$('deleteModal').style.display='flex';}
+$('dlInput').addEventListener('input',()=>{$('dlBtn').disabled=$('dlInput').value.trim()!=='DELETE';});
+async function deleteAccount(){
+ if(!sb||!appUserId)return;
+ $('dlBtn').disabled=true;$('dlBtn').textContent='Deleting…';
+ const r=await sb.rpc('delete_my_account');
+ if(r.error){$('dlBtn').textContent='Delete my account';$('dlBtn').disabled=false;toast('Could not delete: '+r.error.message);return;}
+ $('deleteModal').style.display='none';
+ try{await sb.auth.signOut();}catch(e){}
+ leaveApp();toast('Your account was deleted.');
+}
+
+/* ============ WHO CAN JOIN: request to join + friends only ============ */
+function joinOrRequest(a,btn){return (a.join_mode==='request')?requestJoin(a,btn):joinLive(a.id,btn);}
+async function loadRequests(){
+ if(!sb||!appUserId)return;
+ try{
+  const m=await sb.from('join_requests').select('id,activity_id,user_id,status,created_at').eq('user_id',appUserId);
+  myReqs={};(m.data||[]).forEach(x=>{myReqs[x.activity_id]=x;});
+  const created=mine.filter(a=>a.creator_id===appUserId).map(a=>a.id);
+  hostReqs=[];
+  if(created.length){
+   const h=await sb.from('join_requests').select('id,activity_id,user_id,status,created_at').in('activity_id',created).eq('status','pending').order('created_at',{ascending:true});
+   hostReqs=h.data||[];await loadPeople(hostReqs.map(x=>x.user_id));
+  }
+  renderLive();renderMine();
+ }catch(e){console.warn('Requests not loaded:',e.message||e);}
+}
+async function requestJoin(a,btn){
+ if(!sb||!appUserId){needLogin('request to join');return;}
+ if(!safetyAcked()){showSafetyAck(()=>requestJoin(a,btn));return;}
+ btn.disabled=true;
+ const r=await sb.from('join_requests').insert({activity_id:a.id,user_id:appUserId});
+ btn.disabled=false;
+ if(r.error&&r.error.code!=='23505'){toast('Could not send request: '+r.error.message);return;}
+ toast('Request sent. The host will review it.');loadRequests();
+}
+async function cancelRequest(a){
+ const r=await sb.from('join_requests').delete().eq('activity_id',a.id).eq('user_id',appUserId);
+ if(r.error){toast('Could not cancel: '+r.error.message);return;}
+ loadRequests();
+}
+function openRequests(actId){
+ const a=mine.find(x=>x.id===actId)||live.find(x=>x.id===actId)||{};
+ $('reqTitle').textContent='Requests · '+(a.title||'Activity');
+ const body=$('reqBody');body.innerHTML='';
+ const list=hostReqs.filter(x=>x.activity_id===actId);
+ if(!list.length)body.appendChild(mk('div','empty','No pending requests.'));
+ list.forEach(q=>{
+  const p=people[q.user_id]||{id:q.user_id,full_name:names[q.user_id]};
+  const r=mk('div','bizrow');
+  const l=mk('div','');l.style.cssText='display:flex;gap:12px;align-items:center;cursor:pointer';l.appendChild(avatarEl(p,42));
+  const t=mk('div','');t.appendChild(mk('strong','',p.full_name||p.username||'Someone'));if(p.username)t.appendChild(mk('div','meta','@'+p.username));l.appendChild(t);
+  l.onclick=()=>{$('reqModal').style.display='none';openUser(q.user_id);};r.appendChild(l);
+  const bt=mk('div','');bt.style.cssText='display:flex;gap:8px';
+  const ok=mk('button','btn small','Approve');ok.type='button';ok.onclick=()=>decideRequest(q,true,ok);
+  const no=mk('button','btn secondary small','Decline');no.type='button';no.onclick=()=>decideRequest(q,false,no);
+  bt.appendChild(ok);bt.appendChild(no);r.appendChild(bt);body.appendChild(r);
+ });
+ $('reqModal').style.display='flex';
+}
+async function decideRequest(q,approve,btn){
+ btn.disabled=true;
+ const r=await sb.rpc('decide_join_request',{p_id:q.id,p_approve:approve});
+ if(r.error){btn.disabled=false;toast(r.error.message||'Could not update');return;}
+ hostReqs=hostReqs.filter(x=>x.id!==q.id);
+ toast(approve?'Approved. They can now join the chat.':'Declined');
+ openRequests(q.activity_id);loadLive();
+}
+
 /* ============ LIVE DATA (Supabase) ============ */
 function mk(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
 const ICON={sports:'🏏',hangout:'☕',event:'🎵','study group':'📚',gaming:'🎮'};
@@ -1341,8 +1815,9 @@ function liveCard(a){
  if(cvu)loadImg(cvu,()=>{cv.style.backgroundImage='url("'+cvu+'")';cv.classList.add('photo');cv.textContent='';});
  c.appendChild(cv);
  const b=mk('div','card-body');
- b.appendChild(mk('div','tag',(tier==='top_spot'?'👑 Top Spot · ':tier?'⭐ Featured · ':big?'🔥 Big event · ':'')+(ended?'Ended · ':'')+cat));
+ b.appendChild(mk('div','tag',(tier==='top_spot'?'👑 Top Spot · ':tier?'⭐ Featured · ':big?'🔥 Big event · ':'')+(ended?'Ended · ':'')+(a.join_mode==='request'?'✋ By request · ':a.join_mode==='friends'?'👥 Friends only · ':'')+cat));
  b.appendChild(mk('h3','',a.title||'Untitled'));
+ if(a.creator_id&&a.creator_id!==appUserId&&names[a.creator_id]){const by=mk('div','meta','👤 '+names[a.creator_id]);by.style.cursor='pointer';by.onclick=()=>openUser(a.creator_id);b.appendChild(by);}
  b.appendChild(mk('div','meta','📍 '+(a.location||'Islamabad')+distLabel(a)));
  const w=when(a);if(w)b.appendChild(mk('div','meta','🗓 '+w));
  const act=mk('div','card-actions');
@@ -1354,26 +1829,37 @@ function liveCard(a){
   row.appendChild(ch);row.appendChild(lv);
  }else{
   const full=a.max_members&&(counts[a.id]||0)>=a.max_members;
-  const btn=mk('button','btn small',full?'Full':'Join');btn.type='button';
-  if(full){btn.disabled=true;}else{btn.onclick=()=>joinLive(a.id,btn);}
-  row.appendChild(btn);
+  const mode=a.join_mode||'open',rq=myReqs[a.id];
+  if(mode==='request'&&rq&&rq.status==='pending'){const b1=mk('button','btn secondary small','Requested ⏳');b1.disabled=true;const b2=mk('button','btn secondary small','Cancel');b2.type='button';b2.onclick=()=>cancelRequest(a);row.appendChild(b1);row.appendChild(b2);}
+  else if(mode==='request'&&rq&&rq.status==='declined'){const b1=mk('button','btn secondary small','Declined');b1.disabled=true;row.appendChild(b1);}
+  else{
+   const btn=mk('button','btn small',full?'Full':(mode==='request'?'Request to join':'Join'));btn.type='button';
+   if(full){btn.disabled=true;}else{btn.onclick=()=>joinOrRequest(a,btn);}
+   row.appendChild(btn);
+  }
  }
  act.appendChild(row);b.appendChild(act);
  if(appUserId&&a.creator_id===appUserId){
   const mg=mk('div','card-actions');mg.style.marginTop='8px';
   const ed=mk('button','btn secondary small','✎ Edit');ed.type='button';ed.onclick=()=>openEditAct(a);
   const dl=mk('button','btn danger small','Delete');dl.type='button';dl.onclick=()=>deleteAct(a);
+  const nreq=hostReqs.filter(x=>x.activity_id===a.id).length;
+  if(nreq){const rb=mk('button','btn small','✋ '+nreq+' request'+(nreq>1?'s':''));rb.type='button';rb.onclick=()=>openRequests(a.id);mg.appendChild(rb);}
   mg.appendChild(ed);mg.appendChild(dl);b.appendChild(mg);
  }
+ const ft=mk('div','meta');ft.style.cssText='display:flex;gap:16px;margin-top:10px';
+ const sh=mk('span','','↗ Share');sh.style.cursor='pointer';sh.onclick=()=>shareActivity(a);ft.appendChild(sh);
+ if(a.creator_id!==appUserId){const rp=mk('span','','⚑ Report');rp.style.cursor='pointer';rp.onclick=()=>openReport('activity',a.id,'this activity');ft.appendChild(rp);}
+ b.appendChild(ft);
  c.appendChild(b);return c;
 }
 function renderLive(){
- const L=[...live].sort((a,b)=>scoreAct(b)-scoreAct(a));
+ const L=live.filter(a=>!blocked.has(a.creator_id)).sort((a,b)=>scoreAct(b)-scoreAct(a));
  ['liveGrid','liveGridX'].forEach(id=>{const g=$(id);g.innerHTML='';L.forEach(a=>g.appendChild(liveCard(a)));});
  const em=live.length?'':'No live activities yet. Be the first to create one!';
  $('liveMsg').textContent=em;$('liveMsgX').textContent=em;applyFilters();
 }
-function renderStats(){const c=mine.filter(a=>a.creator_id===appUserId).length;$('stCreated').textContent=c;$('stJoined').textContent=Math.max(0,mine.length-c);$('stBiz').textContent=myBiz.length;}
+function renderStats(){$('stCreated').textContent=mine.filter(a=>a.creator_id===appUserId).length;}
 function renderMine(){
  renderStats();
  const box=$('myActs');box.innerHTML='';
@@ -1410,16 +1896,16 @@ async function loadMine(){
   const map={};[...(cr.data||[]),...(jo.data||[])].forEach(a=>{map[a.id]=a;});
   if(uid!==appUserId)return;
   mine=Object.values(map).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));
-  renderMine();renderChats();
+  renderMine();renderChats();loadNotifs();loadRequests();
  }catch(e){console.warn('Your activities not loaded:',e.message||e);}
 }
 async function loadLive(){
  if(!sb){$('liveMsg').textContent='Live activities are unavailable until Supabase is connected.';return;}
  try{
   const y=new Date();y.setDate(y.getDate()-1);const ymd=y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0');
-  let q=sb.from('activities').select('*').gte('activity_date',ymd).order('activity_date',{ascending:true}).limit(60);
-  q=appUserId?q.or('is_public.eq.true,creator_id.eq.'+appUserId):q.eq('is_public',true);
-  const a=await q;if(a.error)throw a.error;
+  const build=fr=>{let q=sb.from('activities').select('*').gte('activity_date',ymd).order('activity_date',{ascending:true}).limit(60);return appUserId?q.or('is_public.eq.true,creator_id.eq.'+appUserId+(fr?',join_mode.eq.friends':'')):q.eq('is_public',true);};
+  let a=await build(true);if(a.error&&/join_mode/.test(a.error.message||''))a=await build(false);
+  if(a.error)throw a.error;
   live=a.data||[];counts={};joined=new Set();
   const ids=live.map(x=>x.id);
   if(ids.length){
@@ -1430,12 +1916,14 @@ async function loadLive(){
   await loadFeatured();
   const miss=[...boosted].filter(id=>!live.some(a=>a.id===id));
   if(miss.length){const x=await sb.from('activities').select('*').in('id',miss);if(!x.error)live=live.concat((x.data||[]).filter(a=>a.is_public!==false||a.creator_id===appUserId));}
-  renderLive();renderFeatured();
+  await loadPeople(live.map(a=>a.creator_id));
+  renderLive();renderFeatured();renderBanner();
   if(appUserId)loadMine();
  }catch(e){console.warn('Activities not loaded:',e.message||e);$('liveMsg').textContent='Could not load activities right now.';}
 }
 async function joinLive(id,btn){
  if(!sb||!appUserId){needLogin('join activities');return;}
+ if(!joined.has(id)&&!safetyAcked()){showSafetyAck(()=>joinLive(id,btn));return;}
  const act=live.find(x=>x.id===id);
  if(!joined.has(id)&&act&&act.max_members&&(counts[id]||0)>=act.max_members){toast('This activity is full.');return;}
  btn.disabled=true;
